@@ -195,7 +195,7 @@ function fillPaoTableFromMoves(movesData){
     const person = (libraries.Library7.Persons && libraries.Library7.Persons[p]) || '';
     const action = (libraries.Library7.Actions && libraries.Library7.Actions[f]) || '';
     const object = (libraries.Library7.Objects && libraries.Library7.Objects[r]) || '';
-    const phrase = `${person} ${action} με ${object}`;
+    const phrase = `${person} ${action} ${object}`;
 
     const cellHtml = `
       <div><strong>Κωδικός:</strong> ${escapeHtml(displayCode)} &nbsp;
@@ -385,3 +385,4 @@ window.addEventListener('load', function(){ setTimeout(adjustTableHeights,100); 
 
 </body>
 </html>
+
