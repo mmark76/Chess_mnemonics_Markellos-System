@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>PGN → SAN/FEN (Standard Layout v2.6)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    textarea { width: 100%; height: 120px; margin-bottom: 10px; }
+    button, input[type="file"] { margin: 5px 0; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 14px; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+    th { background: #eee; }
+    .table-title { margin-left: 20px; margin-top: 25px; }
+    #status { margin: 10px 0; color: #555; } /* ουδέτερο γκρι */
+  </style>
+  <script src="./chess.min.js"></script>
+</head>
+<body>
+
+<h2>PGN → SAN / FEN — Standard v2.6</h2>
+
+<div>
+  <label for="pgnText">Επικόλλησε PGN εδώ:</label><br>
+  <textarea id="pgnText" placeholder="Επικόλλησε PGN..."></textarea>
+  <br>
+  <button onclick="parseFromTextarea()">Ανάλυση PGN (textarea)</button>
+  <input type="file" id="pgnFile" accept=".pgn,.txt" />
+  <button onclick="downloadFEN()">Κατέβασε FEN JSON</button>
+  <div id="status">Έτοιμο</div>
+</div>
+
+<div class="table-title"><h3>Πίνακας SAN</h3></div>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>SAN</th>
+      <th>Side</th>
+      <th>Piece</th>
+      <th>To</th>
+      <th>FEN</th>
+    </tr>
+  </thead>
+  <tbody id="sanBody">
+    <tr><td colspan="6">Καμία κίνηση ακόμα…</td></tr>
+  </tbody>
+</table>
+
+<div class="table-title"><h3>Πίνακας PAO</h3></div>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>SAN</th>
+      <th>Locus (Linear MP)</th>
+      <th>PAO</th>
+    </tr>
+  </thead>
+  <tbody id="paoBody">
+    <tr><td colspan="4">Καμία κίνηση ακόμα…</td></tr>
+  </tbody>
+</table>
+
+<div class="table-title"><h3>Associations (placeholder)</h3></div>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>SAN</th>
+      <th>Locus</th>
+      <th>Association</th>
+    </tr>
+  </thead>
+  <tbody id="assocBody">
+    <tr><td colspan="4">[Έτοιμο για μελλοντική σύνδεση με βιβλιοθήκες]</td></tr>
+  </tbody>
+</table>
+
+<script>
+/* === Libraries === */
+let libraries = null;
+
+function tryInlineLibraries() {
+  const el = document.getElementById('libraries-json');
+  if (!el) return false;
+  try {
+    libraries = JSON.parse(el.textContent);
+    console.log("Libraries (inline):", libraries);
+    return true;
+  } catch (e) {
+    console.warn("Αποτυχία parsing inline libraries:", e);
+    return false;
+  }
+}
+
+fetch("libraries.json")
+  .then(r => { if (!r.ok) throw new Error(r.status + " " + r.statusText); return r.json(); })
+  .then(data => { libraries = data; console.log("Libraries (fetched):", libraries); })
+  .catch(err => {
+    console.warn("Αποτυχία fetch libraries.json:", err);
+    if (!tryInlineLibraries()) {
+      const s = document.getElementById('status');
+      if (s) { s.textContent = "Αποτυχία φόρτωσης των βιβλιοθηκών (libraries.json)"; s.style.color = "#c00"; }
+    } else {
+      const s = document.getElementById('status');
+      if (s) { s.textContent = "OK: Libraries loaded (inline fallback)"; s.style.color = "#0a0"; }
+    }
+  });
+
+/* === SAN TABLE (unchanged behavior) === */
+function getSANHistoryFromPGN(pgn) {
+  // Απλό splitter για PGNs (παραλείπουμε headers)
+  const lines = pgn.split(/\r?\n/).filter(Boolean).filter(l => !l.startsWith('['));
+  const text = lines.join(' ');
+  // αφαιρούμε τα σχόλια {...} και τις αριθμήσεις 1., 2., ...
+  const cleaned = text.replace(/\{[^}]*\}/g,'').replace(/\d+\.+/g,'').trim();
+  // χωρίζουμε κατά κενά
+  const toks = cleaned.split(/\s+/).filter(Boolean);
+  // φιλτράρουμε αποκλείοντας τα αποτελέσματα (1-0, 0-1, 1/2-1/2)
+  return toks.filter(t => !/^(1-0|0-1|1\/2-1\/2)$/.test(t));
+}
+
+function fillSanTable(sanList) {
+  const sanBody = document.getElementById('sanBody');
+  sanBody.innerHTML = '';
+  const replay = new Chess();
+
+  let moveNo = 0;
+  for (let i = 0; i < sanList.length; i++) {
+    const san = sanList[i];
+    const move = replay.move(san, { sloppy: true });
+    if (!move) continue;
+
+    let moveNumDisplay;
+    if (move.color === 'w') {
+      moveNo++;
+      moveNumDisplay = moveNo; // "1"
+    } else {
+      moveNumDisplay = moveNo + "..."; // "1..."
+    }
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${moveNumDisplay}</td>
+      <td>${san}</td>
+      <td>${move.color === 'w' ? 'Λευκά' : 'Μαύρα'}</td>
+      <td>${move.piece.toUpperCase()}</td>
+      <td>${move.to}</td>
+      <td><small>${escapeHtml(replay.fen())}</small></td>
+    `;
+    sanBody.appendChild(tr);
+  }
+
+  if (sanList.length === 0) {
+    sanBody.innerHTML = '<tr><td colspan="6">Καμία κίνηση ακόμα…</td></tr>';
+  }
+
+  // Δεν αγγίζουμε τον Associations πίνακα (μένει placeholder).
+}
+
+/* === PAO TABLE (Library7) === */
+function fillPaoTableFromSAN(sanList) {
+  const paoBody = document.getElementById('paoBody');
+  if (!sanList || sanList.length === 0) {
+    paoBody.innerHTML = '<tr><td colspan="4">Καμία κίνηση ακόμα…</td></tr>';
+    return;
+  }
+  if (!libraries || !libraries.Library7) {
+    paoBody.innerHTML = '<tr><td colspan="4">Δεν φορτώθηκαν οι βιβλιοθήκες (libraries.json)</td></tr>';
+    return;
+  }
+
+  paoBody.innerHTML = '';
+  const replay = new Chess();
+
+  const pieceMap   = { p:'1', n:'2', b:'3', r:'4', q:'5', k:'6' };
+  const fileMap    = { a:'1', b:'2', c:'3', d:'4', e:'5', f:'6', g:'7', h:'8' };
+  const pieceLetter= { p:'P', n:'N', b:'B', r:'R', q:'Q', k:'K' };
+
+  for (let i = 0; i < sanList.length; i++) {
+    const san = sanList[i];
+    const move = replay.move(san, { sloppy: true });
+    if (!move) continue;
+
+    // Υπολογισμός ψηφίων P / file / rank
+    const p = pieceMap[move.piece] || '0';
+    const f = fileMap[move.to[0]];
+    const r = move.to[1];
+
+    // Ανίχνευση "ευαίσθητου" συνδυασμού χωρίς literal αριθμητικό
+    const isMaskedTriple = (p === '6' && f === '6' && r === '6');
+
+    // Τριψήφιος κωδικός (για εσωτερική χρήση/λογική)
+    const rawCode = p + f + r;
+
+    // Τι θα εμφανίσουμε ως "code" μέσα στη στήλη PAO:
+    // - Συνήθως: τον τριψήφιο κωδικό (π.χ. 154)
+    // - Στην ειδική περίπτωση: SAN-like (π.χ. Kf6)
+    const displayCode = isMaskedTriple
+      ? ((pieceLetter[move.piece] || '') + move.to)
+      : rawCode;
+
+    // Ανάγνωση P/A/O από Library7
+    const person = libraries.Library7.Persons[p] || '';
+    const action = libraries.Library7.Actions[f] || '';
+    const object = libraries.Library7.Objects[r] || '';
+
+    // Πλήρης πρόταση PAO
+    const phrase = `${person} ${action} με ${object}`;
+
+    // Όλο το περιεχόμενο σε ΜΙΑ στήλη (“PAO”)
+    const cellHtml = `
+      <div><strong>Κωδικός:</strong> ${escapeHtml(displayCode)} &nbsp;
+           <small>(${escapeHtml((pieceLetter[move.piece] || '') + move.to)})</small></div>
+      <div><strong>P:</strong> ${escapeHtml(person)} &nbsp;
+           <strong>A:</strong> ${escapeHtml(action)} &nbsp;
+           <strong>O:</strong> ${escapeHtml(object)}</div>
+      <div><em>${escapeHtml(phrase)}</em></div>
+    `;
+
+    // Υπολογισμός αριθμού πλήρους κίνησης (ίδιος για λευκό και μαύρο)
+    const movePair = Math.floor(i / 2) + 1;   // 1,1,2,2,3,3,...
+    const isBlack = (i % 2) === 1;
+    const moveNoLabel = String(movePair);
+
+    // Locus: lookup στη Library1 (wrap-around αν χρειαστεί)
+    const L1 = libraries.Library1 || {};
+    const L1Count = Object.keys(L1).length || 0;
+    const idx = L1Count ? ((movePair - 1) % L1Count) + 1 : movePair;
+    const locusName = L1[String(idx)] || '';
+    const locusDisplay = locusName ? `${idx} — ${locusName}` : String(idx);
+
+    tr.innerHTML = `<td>${moveNoLabel}</td><td>${san}</td><td style="text-align:left">${escapeHtml(locusDisplay)}</td><td style="text-align:left">${cellHtml}</td>`;
+    paoBody.appendChild(tr);
+  }
+}
+
+/* === Utils === */
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => (
+    { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m]
+  ));
+}
+
+/* === Entry points === */
+function parseFromTextarea() {
+  const text = document.getElementById('pgnText').value;
+  try {
+    const sanList = getSANHistoryFromPGN(text);
+    fillSanTable(sanList);          // SAN (όπως v2.3)
+    fillPaoTableFromSAN(sanList);   // PAO (Library7)
+    document.getElementById('status').textContent = "OK: Ανάλυση PGN από textarea";
+    document.getElementById('status').style.color = "#0a0";
+  } catch (err) {
+    document.getElementById('status').textContent = "Αποτυχία ανάλυσης PGN.";
+    document.getElementById('status').style.color = "#c00";
+    console.error(err);
+  }
+}
+
+document.getElementById('pgnFile').addEventListener('change', function(ev){
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const text = e.target.result;
+      const sanList = getSANHistoryFromPGN(text);
+      fillSanTable(sanList);
+      fillPaoTableFromSAN(sanList);
+      document.getElementById('status').textContent = "OK: Ανάλυση PGN από αρχείο";
+      document.getElementById('status').style.color = "#0a0";
+    } catch (err) {
+      document.getElementById('status').textContent = "Αποτυχία ανάλυσης PGN.";
+      document.getElementById('status').style.color = "#c00";
+      console.error(err);
+    }
+  };
+  reader.readAsText(file, 'utf-8');
+});
+
+function downloadFEN() {
+  try {
+    const sanBody = document.getElementById('sanBody');
+    const rows = Array.from(sanBody.querySelectorAll('tr'));
+    const data = rows.map(r => {
+      const cols = r.querySelectorAll('td');
+      if (!cols || cols.length < 6) return null;
+      return {
+        moveNo: cols[0].textContent.trim(),
+        san: cols[1].textContent.trim(),
+        side: cols[2].textContent.trim(),
+        piece: cols[3].textContent.trim(),
+        to: cols[4].textContent.trim(),
+        fen: cols[5].textContent.trim()
+      };
+    }).filter(Boolean);
+    const blob = new Blob([JSON.stringify({moves:data}, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'fen_moves.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch(e){ console.error(e); alert('Σφάλμα κατά τη δημιουργία του αρχείου.'); }
+}
+
+</script>
+
+<!-- Προαιρετικό inline fallback (χρησιμοποιήστε μόνο αν ΔΕΝ σερβίρετε το libraries.json) -->
+<!--
+<script type="application/json" id="libraries-json">
+{ ... επικόλλησε εδώ το περιεχόμενο του libraries.json αν χρειαστεί ... }
+</script>
+-->
+
+</body>
+</html>

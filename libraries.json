@@ -1,0 +1,980 @@
+{
+  "meta": {
+    "source_file": "libraries.txt",
+    "generated_at": "2025-09-07T17:06:33.498692+00:00"
+  },
+  "Library1": {
+    "1": "Entrance Door",
+    "2": "Mailbox",
+    "3": "Tree",
+    "4": "Parking Gate",
+    "5": "Red Car",
+    "6": "Grey Car",
+    "7": "BBQ",
+    "8": "Faucet",
+    "9": "Orange Tree",
+    "10": "Lemon Tree",
+    "11": "Olive Tree",
+    "12": "Basketball Hoop",
+    "13": "Mandarin Tree",
+    "14": "Swing",
+    "15": "Veranda Storage Closet",
+    "16": "Table on Veranda",
+    "17": "Bonsai Tree",
+    "18": "Treadmill",
+    "19": "Kitchen Island",
+    "20": "Sink",
+    "21": "Cupboard",
+    "22": "Refrigerator",
+    "23": "Dining Table",
+    "24": "Piano",
+    "25": "Coffee Table",
+    "26": "Sofa",
+    "27": "Television",
+    "28": "Puff",
+    "29": "Mirror",
+    "30": "Closet in Living Room",
+    "31": "Small Hallway",
+    "32": "Storage Under Stairs",
+    "33": "Middle Step on Stairs",
+    "34": "Small Corridor",
+    "35": "Last Step on Stairs",
+    "36": "First Step on Stairs",
+    "37": "Cleaning Closet",
+    "38": "Washing Machine",
+    "39": "Dryer Machine",
+    "40": "Towel Closet",
+    "41": "Bedroom Door",
+    "42": "Bedroom Closet",
+    "43": "Nightstand",
+    "44": "Bed",
+    "45": "Nightstand",
+    "46": "Ensuite WC",
+    "47": "Mirror",
+    "48": "Television",
+    "49": "WC Door",
+    "50": "Sink",
+    "51": "Mirror",
+    "52": "Window",
+    "53": "Shower",
+    "54": "Massage Machine",
+    "55": "Laundry Basket",
+    "56": "Toilet",
+    "57": "Office Door",
+    "58": "Office Closet",
+    "59": "Sofa",
+    "60": "Window",
+    "61": "Clothes Rack",
+    "62": "Bookshelf",
+    "63": "Desk",
+    "64": "Printer"
+  },
+  "Library2": {
+    "1": "🦃 Turkey",
+    "2": "🦢 Swan",
+    "3": "🦋 Butterfly",
+    "4": "🐀 Rat",
+    "5": "🐝 Bee",
+    "6": "🐑 Sheep",
+    "7": "🐏 Agrino",
+    "8": "🐈‍⬛ Bobcat",
+    "9": "🐖 Pig",
+    "10": "🐔 Hen"
+  },
+  "Library3": {
+    "P": {
+      "piece": "Pawn",
+      "code": "1"
+    },
+    "N": {
+      "piece": "Knight",
+      "code": "2"
+    },
+    "B": {
+      "piece": "Bishop",
+      "code": "3"
+    },
+    "R": {
+      "piece": "Rook",
+      "code": "4"
+    },
+    "Q": {
+      "piece": "Queen",
+      "code": "5"
+    },
+    "K": {
+      "piece": "King",
+      "code": "6"
+    },
+    "x": {
+      "piece": "Capture",
+      "code": "7"
+    },
+    "+": {
+      "piece": "Check",
+      "code": "8"
+    },
+    "#": {
+      "piece": "Checkmate",
+      "code": "9"
+    },
+    "0-0": "0"
+  },
+  "Library4": {
+    "00": {
+      "letters": "O O",
+      "person": "Oprah Winfrey",
+      "occupation": "Orator",
+      "action": "μιλά σε κοινό",
+      "object": "μικρόφωνο"
+    },
+    "01": {
+      "letters": "O A",
+      "person": "Orlando Bloom",
+      "occupation": "Actor",
+      "action": "παίζει ρόλο",
+      "object": "σπαθί"
+    },
+    "02": {
+      "letters": "O B",
+      "person": "Hakeem Olajuwon",
+      "occupation": "Basketball Player",
+      "action": "ντριμπλάρει",
+      "object": "μπάλα μπάσκετ"
+    },
+    "03": {
+      "letters": "O C",
+      "person": "Ossip Bernstein",
+      "occupation": "Chess Player",
+      "action": "κινεί πιόνι",
+      "object": "σκακιέρα"
+    },
+    "04": {
+      "letters": "O D",
+      "person": "Oliver Stone",
+      "occupation": "Director",
+      "action": "σκηνοθετεί",
+      "object": "κάμερα"
+    },
+    "05": {
+      "letters": "O E",
+      "person": "Ozzy Osbourne",
+      "occupation": "Entertainer",
+      "action": "τραγουδά",
+      "object": "μικρόφωνο"
+    },
+    "06": {
+      "letters": "O S",
+      "person": "Oppenheimer",
+      "occupation": "Scientist",
+      "action": "σχεδιάζει άτομο",
+      "object": "μοντέλο ατόμου"
+    },
+    "07": {
+      "letters": "O G",
+      "person": "Οδυσσέας",
+      "occupation": "Greek",
+      "action": "τραβά τόξο",
+      "object": "καράβι"
+    },
+    "08": {
+      "letters": "O H",
+      "person": "Obi-Wan Kenobi",
+      "occupation": "Hero",
+      "action": "μονομαχεί",
+      "object": "lightsaber"
+    },
+    "09": {
+      "letters": "O N",
+      "person": "George Orwell",
+      "occupation": "Novelist",
+      "action": "γράφει",
+      "object": "βιβλίο"
+    },
+    "10": {
+      "letters": "A O",
+      "person": "Aristotle",
+      "occupation": "Orator",
+      "action": "διδάσκει",
+      "object": "ειλητάριο"
+    },
+    "11": {
+      "letters": "A A",
+      "person": "Al Pacino",
+      "occupation": "Actor",
+      "action": "υποδύεται",
+      "object": "σενάριο"
+    },
+    "12": {
+      "letters": "A B",
+      "person": "Anthony Joshua",
+      "occupation": "Boxer",
+      "action": "πυγμαχεί",
+      "object": "γάντια"
+    },
+    "13": {
+      "letters": "A C",
+      "person": "Anatoly Karpov",
+      "occupation": "Chess Player",
+      "action": "σκέφτεται",
+      "object": "σκακιέρα"
+    },
+    "14": {
+      "letters": "A D",
+      "person": "Anthony Fauci",
+      "occupation": "Doctor",
+      "action": "εξετάζει",
+      "object": "στηθοσκόπιο"
+    },
+    "15": {
+      "letters": "A E",
+      "person": "Adele",
+      "occupation": "Entertainer",
+      "action": "τραγουδά",
+      "object": "μικρόφωνο"
+    },
+    "16": {
+      "letters": "A S",
+      "person": "Albert Einstein",
+      "occupation": "Scientist",
+      "action": "γράφει εξίσωση",
+      "object": "κιμωλία"
+    },
+    "17": {
+      "letters": "A G",
+      "person": "Alexander the Great",
+      "occupation": "Greek",
+      "action": "μάχεται",
+      "object": "σπαθί"
+    },
+    "18": {
+      "letters": "A H",
+      "person": "Achilles",
+      "occupation": "Hero",
+      "action": "καρφώνει δόρυ",
+      "object": "ασπίδα"
+    },
+    "19": {
+      "letters": "A N",
+      "person": "Agatha Christie",
+      "occupation": "Novelist",
+      "action": "γράφει",
+      "object": "βιβλίο"
+    },
+    "20": {
+      "letters": "B O",
+      "person": "Barack Obama",
+      "occupation": "Orator",
+      "action": "εκφωνεί λόγο",
+      "object": "podium"
+    },
+    "21": {
+      "letters": "B A",
+      "person": "Marlon Brando",
+      "occupation": "Actor",
+      "action": "παίζει ρόλο",
+      "object": "καπέλο"
+    },
+    "22": {
+      "letters": "B B",
+      "person": "Kobe Bryant",
+      "occupation": "Basketball Player",
+      "action": "σουτάρει",
+      "object": "μπάλα"
+    },
+    "23": {
+      "letters": "B C",
+      "person": "Bobby Fischer",
+      "occupation": "Chess Player",
+      "action": "κινεί κομμάτι",
+      "object": "σκακιέρα"
+    },
+    "24": {
+      "letters": "B D",
+      "person": "Bernardo Bertolucci",
+      "occupation": "Director",
+      "action": "σκηνοθετεί",
+      "object": "κάμερα"
+    },
+    "25": {
+      "letters": "B E",
+      "person": "Beyoncé",
+      "occupation": "Entertainer",
+      "action": "τραγουδά",
+      "object": "μικρόφωνο"
+    },
+    "26": {
+      "letters": "B S",
+      "person": "Bruce Lee",
+      "occupation": "Sportsman",
+      "action": "κλωτσά",
+      "object": "νουντσάκου"
+    },
+    "27": {
+      "letters": "B G",
+      "person": "Lord Byron",
+      "occupation": "Greek",
+      "action": "γράφει ποίηση",
+      "object": "ειλητάριο"
+    },
+    "28": {
+      "letters": "B H",
+      "person": "Batman",
+      "occupation": "Hero",
+      "action": "πετάει γάντζο",
+      "object": "μπέρτα"
+    },
+    "29": {
+      "letters": "B N",
+      "person": "Jorge Luis Borges",
+      "occupation": "Novelist",
+      "action": "γράφει",
+      "object": "χειρόγραφο"
+    },
+    "30": {
+      "letters": "C O",
+      "person": "Cicero",
+      "occupation": "Orator",
+      "action": "αγορεύει",
+      "object": "πάπυρος"
+    },
+    "31": {
+      "letters": "C A",
+      "person": "Charlie Chaplin",
+      "occupation": "Actor",
+      "action": "μιμείται",
+      "object": "μπαστούνι"
+    },
+    "32": {
+      "letters": "C B",
+      "person": "Charles Barkley",
+      "occupation": "Basketball Player",
+      "action": "ντριμπλάρει",
+      "object": "μπάλα"
+    },
+    "33": {
+      "letters": "C C",
+      "person": "Capablanca",
+      "occupation": "Chess Player",
+      "action": "κινεί πιόνι",
+      "object": "σκακιέρα"
+    },
+    "34": {
+      "letters": "C D",
+      "person": "Christopher Nolan",
+      "occupation": "Director",
+      "action": "σκηνοθετεί",
+      "object": "κάμερα"
+    },
+    "35": {
+      "letters": "C E",
+      "person": "Chopin",
+      "occupation": "Composer",
+      "action": "παίζει πιάνο",
+      "object": "παρτιτούρα"
+    },
+    "36": {
+      "letters": "C S",
+      "person": "Carl Sagan",
+      "occupation": "Scientist",
+      "action": "δείχνει ουρανό",
+      "object": "τηλεσκόπιο"
+    },
+    "37": {
+      "letters": "C G",
+      "person": "Constantine the Great",
+      "occupation": "Greek",
+      "action": "κρατά σταυρό",
+      "object": "πανοπλία"
+    },
+    "38": {
+      "letters": "C H",
+      "person": "Captain America",
+      "occupation": "Hero",
+      "action": "ρίχνει ασπίδα",
+      "object": "ασπίδα"
+    },
+    "39": {
+      "letters": "C N",
+      "person": "Miguel de Cervantes",
+      "occupation": "Novelist",
+      "action": "γράφει",
+      "object": "Δον Κιχώτης"
+    },
+    "40": {
+      "letters": "D O",
+      "person": "Demosthenes",
+      "occupation": "Orator",
+      "action": "μιλά",
+      "object": "πάπυρος"
+    },
+    "41": {
+      "letters": "D A",
+      "person": "Daniel Day-Lewis",
+      "occupation": "Actor",
+      "action": "υποδύεται",
+      "object": "σενάριο"
+    },
+    "42": {
+      "letters": "D B",
+      "person": "Dennis Rodman",
+      "occupation": "Basketball Player",
+      "action": "παίρνει ριμπάουντ",
+      "object": "μπάλα"
+    },
+    "43": {
+      "letters": "D C",
+      "person": "Ding Liren",
+      "occupation": "Chess Player",
+      "action": "παίζει",
+      "object": "σκακιέρα"
+    },
+    "44": {
+      "letters": "D D",
+      "person": "David Lynch",
+      "occupation": "Director",
+      "action": "σκηνοθετεί",
+      "object": "κάμερα"
+    },
+    "45": {
+      "letters": "D E",
+      "person": "Dalida",
+      "occupation": "Entertainer",
+      "action": "τραγουδά",
+      "object": "μικρόφωνο"
+    },
+    "46": {
+      "letters": "D S",
+      "person": "Diego Maradona",
+      "occupation": "Sportsman",
+      "action": "ντριμπλάρει",
+      "object": "μπάλα"
+    },
+    "47": {
+      "letters": "D G",
+      "person": "Democritus",
+      "occupation": "Greek",
+      "action": "μελετά άτομα",
+      "object": "πάπυρος"
+    },
+    "48": {
+      "letters": "D H",
+      "person": "Davy Crockett",
+      "occupation": "Hero",
+      "action": "πυροβολεί",
+      "object": "καπέλο με γούνα"
+    },
+    "49": {
+      "letters": "D N",
+      "person": "Dante Alighieri",
+      "occupation": "Novelist",
+      "action": "γράφει",
+      "object": "Θεία Κωμωδία"
+    },
+    "50": {
+      "letters": "E O",
+      "person": "Elie Wiesel",
+      "occupation": "Orator",
+      "action": "μιλά",
+      "object": "podium"
+    },
+    "51": {
+      "letters": "E A",
+      "person": "Emma Stone",
+      "occupation": "Actor",
+      "action": "υποδύεται",
+      "object": "φόρεμα"
+    },
+    "52": {
+      "letters": "E B",
+      "person": "Evander Holyfield",
+      "occupation": "Boxer",
+      "action": "πυγμαχεί",
+      "object": "γάντια"
+    },
+    "53": {
+      "letters": "E C",
+      "person": "Emanuel Lasker",
+      "occupation": "Chess Player",
+      "action": "σκέφτεται",
+      "object": "σκακιέρα"
+    },
+    "54": {
+      "letters": "E D",
+      "person": "Elizabeth Blackwell",
+      "occupation": "Doctor",
+      "action": "εξετάζει",
+      "object": "στηθοσκόπιο"
+    },
+    "55": {
+      "letters": "E E",
+      "person": "Elvis Presley",
+      "occupation": "Entertainer",
+      "action": "τραγουδά",
+      "object": "κιθάρα"
+    },
+    "56": {
+      "letters": "E S",
+      "person": "Eratosthenes",
+      "occupation": "Scientist",
+      "action": "μετρά γη",
+      "object": "ραβδί/σκιά"
+    },
+    "57": {
+      "letters": "E G",
+      "person": "Euripides",
+      "occupation": "Greek",
+      "action": "γράφει",
+      "object": "πάπυρος"
+    },
+    "58": {
+      "letters": "E H",
+      "person": "Errol Flynn",
+      "occupation": "Hero",
+      "action": "μονομαχεί",
+      "object": "σπαθί"
+    },
+    "59": {
+      "letters": "E N",
+      "person": "Émile Zola",
+      "occupation": "Novelist",
+      "action": "γράφει",
+      "object": "χειρόγραφο"
+    },
+    "60": {
+      "letters": "S O",
+      "person": "Socrates",
+      "occupation": "Orator",
+      "action": "διδάσκει",
+      "object": "κύπελλο"
+    },
+    "61": {
+      "letters": "S A",
+      "person": "Sylvester Stallone",
+      "occupation": "Actor",
+      "action": "πυγμαχεί",
+      "object": "γάντια"
+    },
+    "62": {
+      "letters": "S B",
+      "person": "Shaquille O’Neal",
+      "occupation": "Basketball Player",
+      "action": "καρφώνει",
+      "object": "μπάλα"
+    },
+    "63": {
+      "letters": "S C",
+      "person": "Boris Spassky",
+      "occupation": "Chess Player",
+      "action": "παίζει",
+      "object": "σκακιέρα"
+    },
+    "64": {
+      "letters": "S D",
+      "person": "Sigmund Freud",
+      "occupation": "Doctor",
+      "action": "σημειώνει",
+      "object": "καναπές"
+    },
+    "65": {
+      "letters": "S E",
+      "person": "Shakira",
+      "occupation": "Entertainer",
+      "action": "χορεύει",
+      "object": "μικρόφωνο"
+    },
+    "66": {
+      "letters": "S S",
+      "person": "Arnold Schwarzenegger",
+      "occupation": "Sportsman",
+      "action": "σηκώνει βάρη",
+      "object": "αλτήρας"
+    },
+    "67": {
+      "letters": "S G",
+      "person": "Solon",
+      "occupation": "Greek",
+      "action": "μιλά",
+      "object": "ειλητάριο"
+    },
+    "68": {
+      "letters": "S H",
+      "person": "Superman",
+      "occupation": "Hero",
+      "action": "πετά",
+      "object": "κάπα"
+    },
+    "69": {
+      "letters": "S N",
+      "person": "Stephen King",
+      "occupation": "Novelist",
+      "action": "γράφει",
+      "object": "βιβλίο"
+    },
+    "70": {
+      "letters": "G O",
+      "person": "Gorgias",
+      "occupation": "Orator",
+      "action": "διδάσκει",
+      "object": "πάπυρος"
+    },
+    "71": {
+      "letters": "G A",
+      "person": "George Clooney",
+      "occupation": "Actor",
+      "action": "παίζει ρόλο",
+      "object": "σενάριο"
+    },
+    "72": {
+      "letters": "G B",
+      "person": "Giannis Antetokounmpo",
+      "occupation": "Basketball Player",
+      "action": "καρφώνει",
+      "object": "μπάλα"
+    },
+    "73": {
+      "letters": "G C",
+      "person": "Garry Kasparov",
+      "occupation": "Chess Player",
+      "action": "σκέφτεται",
+      "object": "σκακιέρα"
+    },
+    "74": {
+      "letters": "G D",
+      "person": "Georgios Papanikolaou",
+      "occupation": "Doctor",
+      "action": "εξετάζει",
+      "object": "μικροσκόπιο"
+    },
+    "75": {
+      "letters": "G E",
+      "person": "George Michael",
+      "occupation": "Entertainer",
+      "action": "τραγουδά",
+      "object": "μικρόφωνο"
+    },
+    "76": {
+      "letters": "G S",
+      "person": "Galinos",
+      "occupation": "Scientist",
+      "action": "θεραπεύει",
+      "object": "πάπυρος"
+    },
+    "77": {
+      "letters": "G G",
+      "person": "Gorgo of Sparta",
+      "occupation": "Greek",
+      "action": "στέκεται",
+      "object": "ασπίδα"
+    },
+    "78": {
+      "letters": "G H",
+      "person": "Georgios Karaiskakis",
+      "occupation": "Hero",
+      "action": "πολεμά",
+      "object": "σπαθί"
+    },
+    "79": {
+      "letters": "G N",
+      "person": "Giorgos Elytis",
+      "occupation": "Novelist",
+      "action": "γράφει",
+      "object": "ποίημα"
+    },
+    "80": {
+      "letters": "H O",
+      "person": "Homer",
+      "occupation": "Orator",
+      "action": "απαγγέλλει",
+      "object": "ειλητάριο"
+    },
+    "81": {
+      "letters": "H A",
+      "person": "Heath Ledger",
+      "occupation": "Actor",
+      "action": "παίζει Joker",
+      "object": "μάσκα"
+    },
+    "82": {
+      "letters": "H B",
+      "person": "Henry Cooper",
+      "occupation": "Boxer",
+      "action": "πυγμαχεί",
+      "object": "γάντια"
+    },
+    "83": {
+      "letters": "H C",
+      "person": "Nikolai Valuev",
+      "occupation": "Boxer",
+      "action": "πυγμαχεί",
+      "object": "γάντια"
+    },
+    "84": {
+      "letters": "H D",
+      "person": "Hippocrates",
+      "occupation": "Doctor",
+      "action": "θεραπεύει",
+      "object": "πάπυρος"
+    },
+    "85": {
+      "letters": "H E",
+      "person": "Harry Styles",
+      "occupation": "Entertainer",
+      "action": "τραγουδά",
+      "object": "μικρόφωνο"
+    },
+    "86": {
+      "letters": "H S",
+      "person": "Stephen Hawking",
+      "occupation": "Scientist",
+      "action": "διδάσκει",
+      "object": "καροτσάκι"
+    },
+    "87": {
+      "letters": "H G",
+      "person": "Herodotus",
+      "occupation": "Greek",
+      "action": "γράφει",
+      "object": "πάπυρος"
+    },
+    "88": {
+      "letters": "H H",
+      "person": "Hercules",
+      "occupation": "Hero",
+      "action": "σηκώνει ρόπαλο",
+      "object": "λεοντή"
+    },
+    "89": {
+      "letters": "H N",
+      "person": "Ernest Hemingway",
+      "occupation": "Novelist",
+      "action": "γράφει",
+      "object": "γραφομηχανή"
+    },
+    "90": {
+      "letters": "N O",
+      "person": "Napoleon",
+      "occupation": "Orator",
+      "action": "δίνει διαταγή",
+      "object": "σπαθί"
+    },
+    "91": {
+      "letters": "N A",
+      "person": "Nicolas Cage",
+      "occupation": "Actor",
+      "action": "παίζει ρόλο",
+      "object": "σενάριο"
+    },
+    "92": {
+      "letters": "N B",
+      "person": "Naseem Hamed",
+      "occupation": "Boxer",
+      "action": "πυγμαχεί",
+      "object": "γάντια"
+    },
+    "93": {
+      "letters": "N C",
+      "person": "Nigel Short",
+      "occupation": "Chess Player",
+      "action": "σκέφτεται",
+      "object": "σκακιέρα"
+    },
+    "94": {
+      "letters": "N D",
+      "person": "Niels Bohr",
+      "occupation": "Doctor",
+      "action": "πειραματίζεται",
+      "object": "άτομο"
+    },
+    "95": {
+      "letters": "N E",
+      "person": "Nina Simone",
+      "occupation": "Entertainer",
+      "action": "τραγουδά",
+      "object": "πιάνο"
+    },
+    "96": {
+      "letters": "N S",
+      "person": "Nikola Tesla",
+      "occupation": "Scientist",
+      "action": "πειραματίζεται",
+      "object": "πηνίο"
+    },
+    "97": {
+      "letters": "N G",
+      "person": "Nikos Kazantzakis",
+      "occupation": "Greek",
+      "action": "γράφει",
+      "object": "Ζορμπάς"
+    },
+    "98": {
+      "letters": "N H",
+      "person": "Nestoras",
+      "occupation": "Hero",
+      "action": "κρατά",
+      "object": "κύπελλο κρασιού"
+    },
+    "99": {
+      "letters": "N N",
+      "person": "Vladimir Nabokov",
+      "occupation": "Novelist",
+      "action": "γράφει",
+      "object": "Λολίτα"
+    }
+  },
+  "Library5": {
+    "a8": "Godzilla",
+    "b8": "Bucephalus",
+    "c8": "Vampire",
+    "d8": "Banshee",
+    "e8": "King Kong",
+    "f8": "Warewolf",
+    "g8": "Arion",
+    "h8": "Giant Halk",
+    "a7": "Anaconda",
+    "b7": "Bat",
+    "c7": "Cheetah",
+    "d7": "Deer",
+    "e7": "Elephant",
+    "f7": "Fox",
+    "g7": "Gazelle",
+    "h7": "Hyena",
+    "a2": "Akita",
+    "b2": "Boa",
+    "c2": "Cougar",
+    "d2": "Dingo",
+    "e2": "Eagle",
+    "f2": "Fossa",
+    "g2": "Gnu",
+    "h2": "Hedgehog",
+    "a1": "Minotaur",
+    "b1": "Pegasus",
+    "c1": "Little Owl",
+    "d1": "Medusa",
+    "e1": "Lion King",
+    "f1": "Sphinx",
+    "g1": "Unicorn",
+    "h1": "Titan Atlas"
+  },
+  "Library6": {
+    "a1": "Ένας μικρός λευκός αχυρώνας όπου φυλάσσονται προμήθειες για το βασίλειο.",
+    "a2": "Πολεμίστρες πάνω στα τείχη όπου οι φρουροί στέκονται σε επιφυλακή.",
+    "a3": "Κοραλλιογενής ύφαλος γεμάτος χρώματα, λίγο έξω από το κάστρο.",
+    "a4": "Κρατήρας που κανείς δεν ξέρει πώς σχηματίστηκε.",
+    "a5": "Ηφαίστειο που καπνίζει συνεχώς, γεμάτο ενέργεια.",
+    "a6": "Ύφαλος με πλαγκτόν που λάμπει τη νύχτα.",
+    "a7": "Μαύρη πολεμίστρα με τοξότες.",
+    "a8": "Αχυρώνας προμηθειών στις σκιές.",
+    "b1": "Σταύλοι με δυνατά λευκά άλογα που περιμένουν τους ιππότες τους.",
+    "b2": "Προμαχώνας με τοξότες που προστατεύουν το κάστρο.",
+    "b3": "Φωλιά με νερόφιδα που κρύβονται ανάμεσα στα καλάμια.",
+    "b4": "Στοιχειωμένο νεκροταφείο όπου ησυχάζουν οι ψυχές των προγόνων.",
+    "b5": "Σπασμένη ταφόπλακα που έχει ξεχαστεί.",
+    "b6": "Φωλιά με άγρια πιράνχας.",
+    "b7": "Προμαχώνας έτοιμος για άμυνα.",
+    "b8": "Σταύλοι με μαύρα άλογα.",
+    "c1": "Μεγάλη αίθουσα τραπεζαρίας όπου οι πολεμιστές μαζεύονται για φαγητό και συζήτηση.",
+    "c2": "Πύργος με καυτό λάδι έτοιμο να ριχτεί στους εχθρούς.",
+    "c3": "Αρχαίο κυπαρίσσι που στέκει ως μάρτυρας παλιών εποχών.",
+    "c4": "Βάλτος γεμάτος καλάμια και άγνωστους ήχους.",
+    "c5": "Θάμνοι που παρέχουν κάλυψη αλλά κρύβουν παγίδες.",
+    "c6": "Τεράστιο γέρικο κυπαρίσσι.",
+    "c7": "Πύργος παρατήρησης.",
+    "c8": "Μεγάλη αίθουσα τραπεζαρίας.",
+    "d1": "Δωμάτιο της λευκής βασίλισσας, στολισμένο με όμορφα υφάσματα και κοσμήματα.",
+    "d2": "Σημαία της Λευκής παράταξης που κυματίζει περήφανα.",
+    "d3": "Λευκοί κροκόδειλοι που κολυμπούν στο ρυάκι.",
+    "d4": "Σκοτεινό σπήλαιο που κρύβει αρχαία μυστικά.",
+    "d5": "Βαθύ βάραθρο που κόβει την πρόσβαση.",
+    "d6": "Μαύροι αλιγάτορες σε ήσυχα νερά.",
+    "d7": "Μαύρη σημαία ισχύος.",
+    "d8": "Δωμάτια της μαύρης βασίλισσας.",
+    "e1": "Ο θρόνος του λευκού βασιλιά.",
+    "e2": "Η μεγάλη πύλη του κάστρου, φυλασσόμενη από γενναίους φρουρούς.",
+    "e3": "Γέφυρα από πέτρες που συνδέει δύο μέρη του κάστρου.",
+    "e4": "Μεγάλα δέντρα που στέκονται σαν φύλακες του δάσους.",
+    "e5": "Πεδίο με πυκνό γρασίδι που κρύβει βήματα.",
+    "e6": "Γέφυρα από βράχια προς τα τείχη.",
+    "e7": "Κεντρική μαύρη πύλη με αλυσίδες.",
+    "e8": "Θρόνος του μαύρου βασιλιά.",
+    "f1": "Αίθουσα όπου συναντώνται οι στρατηγοί για να συζητήσουν τη στρατηγική.",
+    "f2": "Άγαλμα λευκού δράκου που φυλάει την είσοδο του κάστρου.",
+    "f3": "Μεγάλος λευκός βράχος που ξεχωρίζει στο τοπίο.",
+    "f4": "Χαράδρα με απότομες πλαγιές.",
+    "f5": "Ύψωμα με πλεονεκτική θέα.",
+    "f6": "Άγρια μαύρα βράχια σαν δόντια.",
+    "f7": "Άγαλμα μαύρου δράκου.",
+    "f8": "Αίθουσα πολέμου στρατηγών.",
+    "g1": "Κουζίνες όπου ετοιμάζονται τα γεύματα για το κάστρο.",
+    "g2": "Πύργος με στρατιώτες που παρακολουθούν το πεδίο μάχης.",
+    "g3": "Σεντούκι στο βυθό του ποταμού.",
+    "g4": "Μικρό μονοπάτι που οδηγεί βαθιά στο δάσος.",
+    "g5": "Ξέφωτο ιδανικό για ανάπαυση ή ενέδρα.",
+    "g6": "Άγκυρα στο βυθό με μύθους και ναυάγια.",
+    "g7": "Πύργος περιμέτρου.",
+    "g8": "Δωμάτια προσωπικού & κουζίνες.",
+    "h1": "Λευκός ναός όπου γίνονται οι διάφορες τελετές.",
+    "h2": "Φυλακές όπου κρατούνται αιχμάλωτοι πολέμου.",
+    "h3": "Παλιός φάρος που ρίχνει το φως του στις ακτές.",
+    "h4": "Γκρεμός που βλέπει σε μια πανέμορφη κοιλάδα.",
+    "h5": "Ρυάκι με καθαρό νερό.",
+    "h6": "Στοιχειωμένο ναυάγιο.",
+    "h7": "Φυλακές με σκοτεινά μυστικά.",
+    "h8": "Σκοτεινός ναός προστατών."
+  },
+  "Library7": {
+    "name": "Chess PAO 000-999",
+    "Persons": {
+      "0": "Μάγος",
+      "1": "Στρατιώτης",
+      "2": "Ιππότης",
+      "3": "Επίσκοπος",
+      "4": "Φρουρός",
+      "5": "Βασίλισσα",
+      "6": "Βασιλιάς",
+      "7": "Σφαγέας",
+      "8": "Κριτής",
+      "9": "Εκτελεστής"
+    },
+    "Actions": {
+      "0": "Μεταμορφώνει",
+      "1": "Περπατάει",
+      "2": "Πολεμάει",
+      "3": "Κηρύττει",
+      "4": "Προστατεύει",
+      "5": "Διατάζει",
+      "6": "Κάθεται",
+      "7": "Χτυπάει",
+      "8": "Ανακοινώνει",
+      "9": "Στέκεται"
+    },
+    "Objects": {
+      "0": "Φωτιά",
+      "1": "Ασπίδα",
+      "2": "Σπαθί",
+      "3": "Βιβλίο",
+      "4": "Σημαία",
+      "5": "Θρόνος",
+      "6": "Στέμμα",
+      "7": "Τσεκούρι",
+      "8": "Καμπάνα",
+      "9": "Τάφος"
+    },
+    "Examples": {
+      "000": "Ο Μάγος μεταμορφώνει με φωτιά",
+      "111": "Ο Στρατιώτης περπατάει με ασπίδα",
+      "222": "Ο Ιππότης πολεμάει με σπαθί",
+      "333": "Ο Επίσκοπος κηρύττει από βιβλίο",
+      "444": "Ο Φρουρός προστατεύει τη σημαία",
+      "555": "Η Βασίλισσα διατάζει από θρόνο",
+      "666": "Ο Βασιλιάς κάθεται φορώντας στέμμα",
+      "777": "Ο Σφαγέας χτυπάει με τσεκούρι",
+      "888": "Ο Κριτής ανακοινώνει με καμπάνα",
+      "999": "Ο Εκτελεστής στέκεται πάνω από τάφο",
+      
+	  "154": "Στρατιώτης διατάζει στη σημαία",
+      "263": "Ιππότης κάθεται με Βιβλίο",
+      "546": "Βασίλισσα προστατεύει Στέμμα"
+    }
+  }
+}

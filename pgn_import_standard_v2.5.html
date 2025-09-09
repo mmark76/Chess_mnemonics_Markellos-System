@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>PGN → SAN/FEN (Standard Layout v2.5)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    textarea { width: 100%; height: 120px; margin-bottom: 10px; }
+    button, input[type="file"] { margin: 5px 0; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 14px; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+    th { background: #eee; }
+    .table-title { margin-left: 20px; margin-top: 25px; }
+    #status { margin: 10px 0; color: #555; } /* ουδέτερο γκρι */
+  </style>
+  <script src="./chess.min.js"></script>
+</head>
+<body>
+
+<h2>Εισαγωγή Παρτίδας σε SAN/PGN</h2>
+<textarea id="pgnText" placeholder="Επικόλλησε παρτίδα σε SAN/PGN ..."></textarea><br>
+<button onclick="parseFromTextarea()">Parse Game</button>
+
+<h3>Import από αρχείο PGN</h3>
+<input type="file" id="pgnFile" accept=".pgn,.txt" onchange="loadFromFile()" />
+
+<div id="status">Καμία ενέργεια ακόμη…</div>
+
+<h3 class="table-title">Πίνακας SAN (ply-by-ply)</h3>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>SAN</th>
+      <th>Χρώμα</th>
+      <th>Κομμάτι</th>
+      <th>Προορισμός</th>
+      <th>FEN</th>
+    </tr>
+  </thead>
+  <tbody id="sanBody">
+    <tr><td colspan="6">Καμία κίνηση ακόμα…</td></tr>
+  </tbody>
+</table>
+
+<h3 class="table-title">Πίνακας PAO</h3>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>SAN</th>
+      <th>Locus (Linear MP)</th>
+      <th>PAO</th>
+    </tr>
+  </thead>
+  <tbody id="paoBody">
+    <tr><td colspan="4">[Έτοιμο για μελλοντική σύνδεση με βιβλιοθήκες]</td></tr>
+  </tbody>
+</table>
+
+<h3 class="table-title">Πίνακας Associations</h3>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>SAN</th>
+      <th>Locus</th>
+      <th>Association</th>
+    </tr>
+  </thead>
+  <tbody id="assocBody">
+    <tr><td colspan="4">[Έτοιμο για μελλοντική σύνδεση με βιβλιοθήκες]</td></tr>
+  </tbody>
+</table>
+
+<script>
+/* === Libraries === */
+let libraries = null;
+fetch("libraries.json")
+  .then(r => r.json())
+  .then(data => { libraries = data; console.log("Libraries loaded:", libraries); })
+  .catch(() => console.warn("Δεν βρέθηκε/φορτώθηκε το libraries.json"));
+
+/* === PGN helpers (ίδιος κορμός με v2.3) === */
+function normalizePGN(text) {
+  return String(text)
+    .replace(/^\uFEFF/, '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\u00A0/g, ' ')
+    .replace(/½-½/g, '1/2-1/2')
+    .trim();
+}
+
+function getSANHistoryFromPGN(rawText) {
+  const text = normalizePGN(rawText);
+  const game = new Chess();
+  const ok = game.load_pgn(text, { sloppy: true });
+  if (!ok) throw new Error("Αποτυχία φόρτωσης PGN");
+  return game.history(); // λίστα SAN
+}
+
+/* === SAN TABLE (ίδιο με v2.3) === */
+function fillSanTable(sanList) {
+  const sanBody = document.getElementById('sanBody');
+  sanBody.innerHTML = '';
+  const replay = new Chess();
+
+  let moveNo = 0;
+  for (let i = 0; i < sanList.length; i++) {
+    const san = sanList[i];
+    const move = replay.move(san, { sloppy: true });
+    if (!move) continue;
+
+    let moveNumDisplay;
+    if (move.color === 'w') {
+      moveNo++;
+      moveNumDisplay = moveNo; // "1"
+    } else {
+      moveNumDisplay = moveNo + "..."; // "1..."
+    }
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${moveNumDisplay}</td>
+      <td>${san}</td>
+      <td>${move.color === 'w' ? 'Λευκά' : 'Μαύρα'}</td>
+      <td>${move.piece.toUpperCase()}</td>
+      <td>${move.to}</td>
+      <td><small>${escapeHtml(replay.fen())}</small></td>
+    `;
+    sanBody.appendChild(tr);
+  }
+
+  if (sanList.length === 0) {
+    sanBody.innerHTML = '<tr><td colspan="6">Καμία κίνηση ακόμα…</td></tr>';
+  }
+
+  // Δεν αγγίζουμε τον Associations πίνακα (μένει placeholder).
+}
+
+/* === PAO TABLE (Library7) === */
+function fillPaoTableFromSAN(sanList) {
+  const paoBody = document.getElementById('paoBody');
+  if (!sanList || sanList.length === 0) {
+    paoBody.innerHTML = '<tr><td colspan="4">Καμία κίνηση ακόμα…</td></tr>';
+    return;
+  }
+  if (!libraries || !libraries.Library7) {
+    paoBody.innerHTML = '<tr><td colspan="4">Δεν φορτώθηκαν οι βιβλιοθήκες (libraries.json)</td></tr>';
+    return;
+  }
+
+  paoBody.innerHTML = '';
+  const replay = new Chess();
+
+  const pieceMap   = { p:'1', n:'2', b:'3', r:'4', q:'5', k:'6' };
+  const fileMap    = { a:'1', b:'2', c:'3', d:'4', e:'5', f:'6', g:'7', h:'8' };
+  const pieceLetter= { p:'P', n:'N', b:'B', r:'R', q:'Q', k:'K' };
+
+  for (let i = 0; i < sanList.length; i++) {
+    const san = sanList[i];
+    const move = replay.move(san, { sloppy: true });
+    if (!move) continue;
+
+    // Υπολογισμός ψηφίων P / file / rank
+    const p = pieceMap[move.piece] || '0';
+    const f = fileMap[move.to[0]];
+    const r = move.to[1];
+
+    // Ανίχνευση "ευαίσθητου" συνδυασμού χωρίς literal αριθμητικό
+    const isMaskedTriple = (p === '6' && f === '6' && r === '6');
+
+    // Τριψήφιος κωδικός (για εσωτερική χρήση/λογική)
+    const rawCode = p + f + r;
+
+    // Τι θα εμφανίσουμε ως "code" μέσα στη στήλη PAO:
+    // - Συνήθως: τον τριψήφιο κωδικό (π.χ. 154)
+    // - Στην ειδική περίπτωση: SAN-like (π.χ. Kf6)
+    const displayCode = isMaskedTriple
+      ? ((pieceLetter[move.piece] || '') + move.to)
+      : rawCode;
+
+    // Ανάγνωση P/A/O από Library7
+    const person = libraries.Library7.Persons[p] || '';
+    const action = libraries.Library7.Actions[f] || '';
+    const object = libraries.Library7.Objects[r] || '';
+
+    // Πλήρης πρόταση PAO
+    const phrase = `${person} ${action} με ${object}`;
+
+    // Όλο το περιεχόμενο σε ΜΙΑ στήλη (“PAO”), όπως συμφωνήσαμε
+    const cellHtml = `
+      <div><strong>Κωδικός:</strong> ${escapeHtml(displayCode)} &nbsp;
+           <small>(${escapeHtml((pieceLetter[move.piece] || '') + move.to)})</small></div>
+      <div><strong>P:</strong> ${escapeHtml(person)} &nbsp;
+           <strong>A:</strong> ${escapeHtml(action)} &nbsp;
+           <strong>O:</strong> ${escapeHtml(object)}</div>
+      <div><em>${escapeHtml(phrase)}</em></div>
+    `;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i+1}</td><td>${san}</td><td>${i+1}</td><td style="text-align:left">${cellHtml}</td>`;
+    paoBody.appendChild(tr);
+  }
+}
+
+/* === Utils === */
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => (
+    { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m]
+  ));
+}
+
+/* === Entry points === */
+function parseFromTextarea() {
+  const text = document.getElementById('pgnText').value;
+  try {
+    const sanList = getSANHistoryFromPGN(text);
+    fillSanTable(sanList);          // SAN (όπως v2.3)
+    fillPaoTableFromSAN(sanList);   // PAO (Library7)
+    document.getElementById('status').textContent = "OK: Ανάλυση PGN από textarea";
+    document.getElementById('status').style.color = "#0a0";
+  } catch (err) {
+    document.getElementById('status').textContent = "Αποτυχία ανάλυσης PGN.";
+    document.getElementById('status').style.color = "#c00";
+    console.error(err);
+  }
+}
+
+function loadFromFile() {
+  const file = document.getElementById('pgnFile').files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const sanList = getSANHistoryFromPGN(e.target.result);
+      fillSanTable(sanList);          // SAN (όπως v2.3)
+      fillPaoTableFromSAN(sanList);   // PAO (Library7)
+      document.getElementById('status').textContent = "OK: Ανάλυση PGN από αρχείο";
+      document.getElementById('status').style.color = "#0a0";
+    } catch (err) {
+      document.getElementById('status').textContent = "Αποτυχία ανάλυσης PGN.";
+      document.getElementById('status').style.color = "#c00";
+      console.error(err);
+    }
+  };
+  reader.readAsText(file, 'utf-8');
+}
+</script>
+
+</body>
+</html>
