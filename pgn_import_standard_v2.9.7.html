@@ -19,6 +19,7 @@
   h1{font-size:20px; margin:12px 0 16px}
   .row{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:6px 0 18px;}
   textarea{width:100%; min-height:130px; background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:12px; padding:10px; resize:vertical;}
+  #pgnText { width:90%; }
   .controls{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
   .btn{background:var(--muted); color:var(--text); border:1px solid var(--border); padding:8px 12px; border-radius:10px; cursor:pointer}
   .btn:hover{background:var(--hover)}
@@ -58,12 +59,12 @@
           <button class="btn" id="btnParse">Import PGN</button>
           <button class="btn" id="btnClear">Καθαρισμός</button>
         </div>
-        <textarea id="pgnText" placeholder="Επικόλλησε εδώ PGN…">1. e4 e5 2. Nf3 Nc6 3. Bb5 a6</textarea>
+<textarea id="pgnText" placeholder="Επικόλλησε εδώ PGN…" style="width:90%">Επικόλλησε εδώ το PGN/SAN ...</textarea>
       </div>
       <div>
         <div class="section-title"><h3>Ρυθμίσεις Βιβλιοθηκών (from libraries.json)</h3></div>
         <div class="table-container" style="padding:10px; max-height:420px; overflow:auto;">
-          <pre id="libsPreview" class="small" style="white-space:pre-wrap; word-break:break-word"></pre>
+<pre id="libsPreview" class="small" style="white-space:pre-wrap; word-break:break-word; max-width:450px; margin-left:auto"></pre>
         </div>
       </div>
     </div>
