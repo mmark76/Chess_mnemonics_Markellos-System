@@ -44,6 +44,20 @@
   .small{font-size:12px}
   .foot{margin:12px 0 40px; color:var(--sub)}
   #libsPreview{ text-align:left!important; direction:ltr!important; margin:0!important; padding-left:8px; white-space:pre-wrap; word-break:break-word; }
+
+  /* Ειδικές ρυθμίσεις για τον πίνακα Associations */
+#assocTable th:nth-child(3),
+#assocTable td:nth-child(3) {
+  min-width: 90px;  /* Side */
+  width: 90px;
+}
+
+#assocTable th:nth-child(5),
+#assocTable td:nth-child(5) {
+  min-width: 140px; /* Piece */
+  width: 140px;
+}
+
 </style>
 </head>
 
@@ -246,6 +260,7 @@ window.addEventListener('load',()=>{ loadLibraries().then(()=>parseFromTextarea(
 </script>
 </body>
 </html>
+
 
 
 
