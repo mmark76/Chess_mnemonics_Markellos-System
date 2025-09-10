@@ -183,7 +183,14 @@ function buildMovesDataFromPGN(pgn){
     const mv=hist[i]; temp2.move(mv);
     const fen=temp2.fen(), index=i, movePair=Math.floor(i/2)+1;
     const side=(i%2===0)?'White':'Black', moveNumDisplay=(i%2===0)?(movePair+'.'):(movePair+'...');
-    movesData.push({index,movePair,moveNumDisplay,san:mv.san,side,piece:(mv.piece||'').toUpperCase(),to:mv.to,fen});
+    let ch = fenPieceAt(m.fen, m.to),
+    u  = (ch || m.piece || '').toString().toUpperCase();
+if (u.length > 1) u = u[0];
+
+const fromKey   = u + (m.from || '');
+const pieceAssoc = L5[fromKey] || L5[u] || pieceLetterToGreekName(u);
+const toDesc     = L6[m.to] || m.to;
+
   }
   return movesData;
 }
@@ -273,6 +280,7 @@ window.addEventListener('load',()=>{ loadLibraries().then(()=>parseFromTextarea(
 </script>
 </body>
 </html>
+
 
 
 
