@@ -223,9 +223,17 @@ function fillAssociationsTableFromMoves(movesData){
   const L1=libraries.Library1||{},L5=libraries.Library5||{},L6=libraries.Library6||{},L1Count=Object.keys(L1).length||0;
   movesData.forEach(m=>{
     const idx=L1Count?((m.movePair-1)%L1Count)+1:m.movePair, locus=L1[String(idx)]||'', locusDisp=locus?`${idx} — ${locus}`:String(idx);
-    let ch=fenPieceAt(m.fen,m.to),u=(ch||m.piece||'').toString().toUpperCase(); if(u.length>1)u=u[0];
-    const pieceAssoc=L5[u]||pieceLetterToGreekName(u), toDesc=L6[m.to]||m.to;
-    const tr=document.createElement('tr'); tr.setAttribute('data-index',String(m.index));
+let ch = fenPieceAt(m.fen, m.to),
+    u  = (ch || m.piece || '').toString().toUpperCase();
+if (u.length > 1) u = u[0];
+
+// Πρώτα ψάχνουμε αν υπάρχει συγκεκριμένο κλειδί στο Library5 (π.χ. "Pa2", "Ng1")
+const fromKey = u + (m.from || '');
+const pieceAssoc = L5[fromKey] || L5[u] || pieceLetterToGreekName(u);
+
+// Περιγραφή τετραγώνου από Library6
+const toDesc = L6[m.to] || m.to;
+const tr=document.createElement('tr'); tr.setAttribute('data-index',String(m.index));
     tr.innerHTML=`<td>${escapeHtml(m.moveNumDisplay)}</td><td>${escapeHtml(m.san)}</td><td>${escapeHtml(m.side)}</td><td style="text-align:left">${escapeHtml(locusDisp)}</td><td style="text-align:left">${escapeHtml(pieceAssoc)}</td><td style="text-align:left">${escapeHtml(toDesc)}</td>`;
     body.appendChild(tr);
   });
@@ -265,6 +273,7 @@ window.addEventListener('load',()=>{ loadLibraries().then(()=>parseFromTextarea(
 </script>
 </body>
 </html>
+
 
 
 
