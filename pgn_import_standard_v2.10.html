@@ -486,6 +486,27 @@
       link.download = filename;
       link.click();
     }
+    
+    /* ----------------------- Sync Scroll ----------------------- */
+function syncScroll(source, targets){
+  source.addEventListener('scroll', () => {
+    targets.forEach(t => {
+      if (t !== source) t.scrollTop = source.scrollTop;
+    });
+  });
+}
+
+window.addEventListener('load', () => {
+  const san = document.getElementById('sanContainer');
+  const pao = document.getElementById('paoContainer');
+  const assoc = document.getElementById('assocContainer');
+
+  [san, pao, assoc].forEach(el => {
+    syncScroll(el, [san, pao, assoc]);
+  });
+});
+
   </script>
 </body>
 </html>
+
