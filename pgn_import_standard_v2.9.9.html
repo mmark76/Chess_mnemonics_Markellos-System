@@ -310,7 +310,7 @@
     /* ----------------------- Εκκίνηση ----------------------- */
     window.addEventListener('load',()=>{ loadLibraries().then(()=>parseFromTextarea()); });
   
-  function downloadTableAsCSV(tableId, filename) {
+ function downloadTableAsCSV(tableId, filename) {
   const table = document.getElementById(tableId);
   if (!table) return;
   let csv = [];
@@ -324,16 +324,10 @@
   link.download = filename;
   link.click();
 }
-
-  const blob = new Blob(["\uFEFF" + csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = filename;
-  link.click();
-}
   </script>
 </body>
 </html>
+
 
 
 
