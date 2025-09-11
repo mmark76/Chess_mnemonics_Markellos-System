@@ -77,7 +77,14 @@
 <body>
   <div class="wrap">
 <header class="cms-header">
-  <h1>Chess Mnemonic System v.2.9.9 — | SAN , PAO , ASSOCIATIONS | Tables</h1>
+  <h1 style="display:inline-block; margin-right:20px;">
+    Chess Mnemonic System v.2.9.9 — | SAN , PAO , ASSOCIATIONS | Tables
+  </h1>
+  <div style="display:inline-block;">
+    <button class="btn" onclick="downloadTableAsCSV('sanTable','san.csv')">Download SAN</button>
+    <button class="btn" onclick="downloadTableAsCSV('paoTable','pao.csv')">Download PAO</button>
+    <button class="btn" onclick="downloadTableAsCSV('assocTable','assoc.csv')">Download Associations</button>
+  </div>
 </header>
     <div class="row">
       <div>
@@ -302,9 +309,26 @@
 
     /* ----------------------- Εκκίνηση ----------------------- */
     window.addEventListener('load',()=>{ loadLibraries().then(()=>parseFromTextarea()); });
+  
+  function downloadTableAsCSV(tableId, filename) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  let csv = [];
+  for (let row of table.rows) {
+    let cols = [...row.cells].map(td => `"${td.innerText.replace(/"/g, '""')}"`);
+    csv.push(cols.join(","));
+  }
+  const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+}
+
   </script>
 </body>
 </html>
+
 
 
 
