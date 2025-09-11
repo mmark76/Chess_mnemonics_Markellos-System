@@ -5,7 +5,7 @@
 ---
 
 ## 1) Αρχεία & Προαπαιτούμενα
-- **`pgn_import_standard_v2.9.8.html`** — Το βασικό HTML/JS της εφαρμογής.
+- **`pgn_import_standard_v2.9.9.html`** — Το βασικό HTML/JS της εφαρμογής.
 - **`libraries.json`** — Οι 7 βιβλιοθήκες (Library1..Library7) με loci, PAO, associations και τετράγωνα.
 - **`chess.min.js` 0.10.3** — Parser/μηχανή SAN & FEN (φορτώνεται από CDN).
 - Προτεινόμενος φάκελος: το `pgn_import_standard_v2.9.9.html` στην ίδια ρίζα με το `libraries.json` (ώστε το `fetch('libraries.json')` να λειτουργεί).
