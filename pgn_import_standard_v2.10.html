@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chess Mnemonic System v.2.10 — SAN - PAO - ASSOCIATIONS | Tables</title>
+
+  <!-- Stable chess.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#0b0f14; --card:#121821; --muted:#1a2230; --text:#e6edf3; --sub:#a9b4c0;
+      --acc:#2ea043; --border:#2d3645; --hover:#223043;
+    }
+    html,body{background:var(--bg); color:var(--text); margin:0; font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+    .wrap{width:100%; max-width:none; margin:24px 0; padding:0 16px;}
+    h1{font-size:20px; margin:12px 0 16px}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:6px 0 18px;align-items:start;}
+    textarea{width:100%; min-height:130px; background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:12px; padding:10px; resize:vertical;}
+    #pgnText{ width:90%; }
+    .controls{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    .btn{background:var(--muted); color:var(--text); border:1px solid var(--border); padding:8px 12px; border-radius:10px; cursor:pointer}
+    .btn:hover{background:var(--hover)}
+    input[type=file]{display:none}
+    label.file{background:var(--muted); padding:8px 12px; border:1px solid var(--border); border-radius:10px; cursor:pointer}
+    .section-title{margin:14px 0 6px}
+
+    /* Layout: SAN full width, PAO+Associations below */
+    .tables{display:grid; grid-template-columns:1fr; gap:12px;}
+    .subtables{display:grid; grid-template-columns: repeat(auto-fit,minmax(320px,1fr)); gap:12px;}
+
+    .table-container{background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:auto; max-height:420px; -webkit-overflow-scrolling:touch}
+    table{width:100%; border-collapse:collapse; min-width:320px; table-layout:fixed}
+    thead{position:sticky; top:0; background:linear-gradient(0deg,var(--card), #0f1621)}
+    th,td{padding:6px 8px; border-bottom:1px solid var(--border); text-align:center; white-space:normal; word-break:break-word;}
+    td.fen, th.fen{max-width:200px;}
+    td:first-child, th:first-child{width:44px}
+    tr.row-hover{background:rgba(46,160,67,0.08)}
+    tr.row-selected{background:rgba(46,160,67,0.18)}
+    .muted{color:var(--sub)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+    .small{font-size:12px}
+    .foot{margin:12px 0 40px; color:var(--sub)}
+    #libsPreview{text-align:left!important; direction:ltr!important; margin:0!important; padding-left:8px; white-space:pre-wrap; word-break:break-word}
+
+    /* Wider columns for Associations: Side & Piece */
+    #assocTable th:nth-child(3), #assocTable td:nth-child(3){ min-width:96px; width:96px; }
+    #assocTable th:nth-child(5), #assocTable td:nth-child(5){ min-width:150px; width:150px; }
+
+    /* Mobile tweaks */
+    @media (max-width: 540px){
+      html,body{font-size:13px}
+      .row{grid-template-columns:1fr}
+      .subtables{grid-template-columns:1fr}
+      th,td{padding:5px 6px}
+      td.fen, th.fen{max-width:140px}
+      #assocTable th:nth-child(3), #assocTable td:nth-child(3){ min-width:72px; width:72px }
+      #assocTable th:nth-child(5), #assocTable td:nth-child(5){ min-width:120px; width:120px }
+    }
+
+    /* Sticky header */
+    .cms-header{position:sticky;top:0;z-index:1000;background:var(--bg);border-bottom:1px solid var(--border);}
+    .cms-header h1{margin:0;padding:12px 16px;font-weight:700;}
+
+    /* Dropdown toolbar */
+    .toolbar{display:flex; gap:10px; align-items:center; background:var(--muted); border:1px solid var(--border); padding:6px 8px; border-radius:10px; margin:6px 0;}
+    .toolbar label{display:flex; gap:6px; align-items:center;}
+    .toolbar select{background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:6px 8px;}
+  </style>
+
+  <script>
+    // Καθαρισμός PGN από engine tags {[%evp ...]}, {[%eval ...]}, {[%clk ...]}
+    function cleanPGN(pgn){
+      return pgn.replace(/\{\s*\[%[\s\S]*?\]\s*\}/gi, '').trim();
+    }
+  </script>
+</head>
+
+<body>
+  <div class="wrap">
+<header class="cms-header">
+  <h1 style="display:inline-block; margin-right:20px;">
+    Chess Mnemonic System v.2.10 — | SAN - PAO - ASSOCIATIONS | Tables
+  </h1>
+  <div style="display:inline-block;">
+    <button class="btn" onclick="downloadTableAsCSV('sanTable','san.csv')">Download SAN</button>
+    <button class="btn" onclick="downloadTableAsCSV('paoTable','pao.csv')">Download PAO</button>
+    <button class="btn" onclick="downloadTableAsCSV('assocTable','assoc.csv')">Download Associations</button>
+  </div>
+</header>
+    <div class="row">
+      <div>
+        <div class="controls" style="margin-bottom:6px">
+          <label class="file" title="Φόρτωση αρχείου .pgn ή .txt">
+            <input id="pgnFile" type="file" accept=".pgn,.txt"/>
+            Import PGN / SAN
+          </label>
+          <button class="btn" id="btnParse" title="Κάνει parse του κειμένου στο πεδίο">Parse PGN / SAN</button>
+          <button class="btn" id="btnClear">Καθαρισμός</button>
+        </div>
+        <textarea id="pgnText" placeholder="Paste PGN/SAN εδώ και πάτα ‘Parse PGN / SAN’, ή χρησιμοποίησε ‘Import PGN / SAN’ για φόρτωση αρχείου." style="width:90%; min-height:300px;">Paste PGN/SAN εδώ και πάτα «Parse PGN / SAN». Εναλλακτικά, χρησιμοποίησε «Import PGN / SAN» για να φορτώσεις αρχείο.</textarea>
+      </div>
+      <div>
+        <div class="section-title">
+          <h3 style="padding:10px auto;">Βιβλιοθήκες (Libraries.json)</h3>
+          <div class="table-container" id="libsContainer" style="padding:10px; max-height:300px; max-width:480px; margin:0; overflow:auto;">
+            <pre id="libsPreview" class="small"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tables">
+      <!-- SAN Table -->
+      <div>
+        <div class="section-title"><h3>SAN Table</h3></div>
+        <!-- Toolbar πάνω από SAN -->
+        <div class="toolbar">
+          <label> Locus (memory palace):
+            <select id="sanLocusSelect"></select>
+          </label>
+        </div>
+        <div id="sanContainer" class="table-container">
+          <table id="sanTable">
+            <thead>
+              <tr><th>#</th><th>SAN</th><th>Side</th><th>Piece</th><th>To</th><th class="fen">FEN</th></tr>
+            </thead>
+            <tbody id="sanBody"><tr><td colspan="6">Καμία κίνηση ακόμα…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PAO + Associations -->
+      <div class="subtables">
+        <div>
+          <div class="section-title"><h3>Πίνακας PAO</h3></div>
+          <!-- Toolbar πάνω από PAO -->
+          <div class="toolbar">
+            <label>Locus:
+              <select id="paoLocusSelect"></select>
+            </label>
+            <label>PAO codes (0–9):
+              <select id="paoCodesSelect"></select>
+            </label>
+          </div>
+          <div id="paoContainer" class="table-container">
+            <table id="paoTable">
+              <thead><tr><th>#</th><th>SAN</th><th>Side</th><th>Locus</th><th>PAO</th></tr></thead>
+              <tbody id="paoBody"><tr><td colspan="5">Καμία κίνηση ακόμα…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div class="section-title"><h3>Πίνακας Associations</h3></div>
+          <!-- Toolbar πάνω από Associations -->
+          <div class="toolbar">
+            <label>Locus:
+              <select id="assocLocusSelect"></select>
+            </label>
+            <label>Piece associations:
+              <select id="assocPiecesSelect"></select>
+            </label>
+            <label>Targets:
+              <select id="assocTargetsSelect"></select>
+            </label>
+          </div>
+          <div id="assocContainer" class="table-container">
+            <table id="assocTable">
+              <thead><tr><th>#</th><th>SAN</th><th>Side</th><th>Locus</th><th>Piece</th><th>To</th></tr></thead>
+              <tbody id="assocBody"><tr><td colspan="6">Καμία κίνηση ακόμα…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot small">Chess Mnemonic System v.2.10 @Markellos Markides 2025</div>
+  </div>
+
+  <script>
+    /* --------------------- Φόρτωση Libraries --------------------- */
+    let libraries = null;
+    let lastMovesData = [];
+
+    function loadLibraries(){
+      return fetch('libraries_v2.10.json')
+        .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(d=>{
+          libraries=d;
+          const jsonString = JSON.stringify(libraries,null,2).replace(/[\u202A-\u202E\u200E\u200F\uFEFF]/g,'');
+          document.getElementById('libsPreview').textContent=jsonString;
+        })
+        .catch(err=>{
+          console.error('libraries.json load failed',err);
+          document.getElementById('libsPreview').textContent='Αποτυχία φόρτωσης libraries.json';
+        });
+    }
+
+    /* ---------------------------- Helpers ---------------------------- */
+    function escapeHtml(s){
+      return (s==null?'':String(s)).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+    }
+    function fenPieceAt(fen,sq){
+      if(!fen||!/^[a-h][1-8]$/.test(sq)) return null;
+      const board=fen.split(' ')[0], rows=board.split('/');
+      const fileIdx=sq.charCodeAt(0)-97, rankIdx=8-parseInt(sq[1],10);
+      let col=0;
+      for(const ch of rows[rankIdx]){
+        if(/\d/.test(ch)) col+=+ch; else { if(col===fileIdx) return ch; col++; }
+      }
+      return null;
+    }
+    function pieceLetterToGreekName(u){
+      const L={P:'Στρατιώτης',N:'Ίππος',B:'Αξιωματικός',R:'Πύργος',Q:'Βασίλισσα',K:'Βασιλιάς'};
+      return L[u]||u;
+    }
+
+    // --- Detectors for dropdown filtering ---
+    function isNumericKeyed(obj){ // potential memory palace/locus
+      if(!obj||typeof obj!=='object') return false;
+      let n=0; for(const k in obj){ if(/^\d+$/.test(k)) n++; }
+      return n>=10;
+    }
+    function isPao009Lib(obj){ // Persons/Actions/Objects 0-9
+      return obj && typeof obj==='object'
+        && obj.Persons && obj.Actions && obj.Objects
+        && Object.keys(obj.Persons).length>=10
+        && Object.keys(obj.Actions).length>=10
+        && Object.keys(obj.Objects).length>=10;
+    }
+    function isSquareKeyed(obj){ // targets a1..h8
+      if(!obj||typeof obj!=='object') return false;
+      let n=0; for(const k in obj){ if(/^[a-h][1-8]$/.test(k)) n++; }
+      return n>=10;
+    }
+    function isPieceAssocLib(obj){ // piece associations by square OR piece+square OR piece-only
+      if(!obj||typeof obj!=='object') return false;
+      let sq=0, ps=0, p=0;
+      for(const k in obj){
+        if(/^[a-h][1-8]$/.test(k)) sq++;
+        else if(/^[PNBRQK][a-h][1-8]$/i.test(k)) ps++;
+        else if(/^[PNBRQK]$/.test(k)) p++;
+      }
+      return (sq>=10) || (ps>=10) || (p>=3);
+    }
+    function populateSelect(el, keys, preferred){
+      el.innerHTML='';
+      keys.forEach(k=>{ const o=document.createElement('option'); o.value=k; o.textContent=k; el.appendChild(o); });
+      if(preferred && keys.includes(preferred)) el.value=preferred;
+    }
+
+    function initDropdowns(){
+      const allKeys = Object.keys(libraries||{}).filter(k=>k!=='meta');
+
+      const locusKeys = allKeys.filter(k=>isNumericKeyed(libraries[k]));
+      const paoKeys   = allKeys.filter(k=>isPao009Lib(libraries[k]));
+      const assocKeys = allKeys.filter(k=>isPieceAssocLib(libraries[k]));
+      const targetKeys= allKeys.filter(k=>isSquareKeyed(libraries[k]));
+
+      populateSelect(document.getElementById('sanLocusSelect'),   locusKeys,  'Library1');
+      populateSelect(document.getElementById('paoLocusSelect'),   locusKeys,  'Library1');
+      populateSelect(document.getElementById('paoCodesSelect'),   paoKeys,    'Library7');
+      populateSelect(document.getElementById('assocLocusSelect'), locusKeys,  'Library1');
+      populateSelect(document.getElementById('assocPiecesSelect'),assocKeys,  'Library5');
+      populateSelect(document.getElementById('assocTargetsSelect'),targetKeys,'Library6');
+
+      ['sanLocusSelect','paoLocusSelect','paoCodesSelect','assocLocusSelect','assocPiecesSelect','assocTargetsSelect']
+        .forEach(id=>document.getElementById(id).addEventListener('change', renderAllTables));
+    }
+
+    /* ---------------------------- Build Moves ---------------------------- */
+    function buildMovesDataFromPGN(pgn){
+      if(typeof Chess==='undefined'){ console.error('Chess.js δεν φορτώθηκε'); return []; }
+      const chess=new Chess();
+      try{ chess.reset(); chess.load_pgn(pgn,{sloppy:true}); }catch(e){ console.warn('load_pgn error',e); }
+      const hist=chess.history({verbose:true}), movesData=[], temp2=new Chess();
+      for(let i=0;i<hist.length;i++){
+        const mv=hist[i];
+        temp2.move(mv);
+        const fen=temp2.fen();
+        const index=i, movePair=Math.floor(i/2)+1;
+        const side=(i%2===0)?'White':'Black', moveNumDisplay=(i%2===0)?(movePair+'.'):(movePair+'...');
+        const piece=(mv.piece||'').toUpperCase();
+        const from=mv.from||''; const to=mv.to||'';
+        movesData.push({index,movePair,moveNumDisplay,san:mv.san,side,piece,from,to,fen});
+      }
+      return movesData;
+    }
+
+    /* ---------------------------- Fill Tables ---------------------------- */
+    function fillSanTable(movesData){
+      const body=document.getElementById('sanBody');
+      if(!movesData.length){ body.innerHTML='<tr><td colspan="6">Καμία κίνηση ακόμα…</td></tr>'; return; }
+      body.innerHTML='';
+      movesData.forEach(m=>{
+        const tr=document.createElement('tr'); tr.setAttribute('data-index',String(m.index));
+        tr.innerHTML=`<td>${escapeHtml(m.moveNumDisplay)}</td><td>${escapeHtml(m.san)}</td><td>${escapeHtml(m.side)}</td><td>${escapeHtml(m.piece)}</td><td>${escapeHtml(m.to)}</td><td class="fen mono small">${escapeHtml(m.fen)}</td>`;
+        body.appendChild(tr);
+      });
+    }
+
+    function fillPaoTableFromMoves(movesData){
+      const body=document.getElementById('paoBody');
+      if(!movesData.length){ body.innerHTML='<tr><td colspan="5">Καμία κίνηση ακόμα…</td></tr>'; return; }
+      body.innerHTML='';
+
+      const locusKey = (document.getElementById('paoLocusSelect')||{}).value;
+      const paoKey   = (document.getElementById('paoCodesSelect')||{}).value;
+
+      const L1 = (libraries[locusKey]||{});
+      const L7 = (libraries[paoKey]||{});
+      const L1Count = Object.keys(L1).length||0;
+
+      const pieceMap={P:'1',N:'2',B:'3',R:'4',Q:'5',K:'6'};
+      const fileMap ={a:'1',b:'2',c:'3',d:'4',e:'5',f:'6',g:'7',h:'8'};
+
+      movesData.forEach(m=>{
+        const p=pieceMap[m.piece]||'0';
+        const f=fileMap[m.to[0]]||'0';
+        const r=m.to[1]||'0';
+
+        const idx = L1Count?((m.movePair-1)%L1Count)+1:m.movePair;
+        const locus = L1[String(idx)]||'';
+        const locusDisp = locus?`${idx} — ${locus}`:String(idx);
+
+        const person=(L7.Persons||{})[p]||'';
+        const action=(L7.Actions||{})[f]||'';
+        const object=(L7.Objects||{})[r]||'';
+
+        const tr=document.createElement('tr'); tr.setAttribute('data-index',String(m.index));
+        tr.innerHTML=
+          `<td>${escapeHtml(m.moveNumDisplay)}</td>`+
+          `<td>${escapeHtml(m.san)}</td>`+
+          `<td>${escapeHtml(m.side)}</td>`+
+          `<td style="text-align:left">${escapeHtml(locusDisp)}</td>`+
+          `<td style="text-align:left">
+             <div><strong>Κωδικός:</strong> ${escapeHtml(p+f+r)} <span class="muted small">(${escapeHtml(m.piece+m.to)})</span></div>
+             <div><strong>P:</strong> ${escapeHtml(person)} &nbsp; <strong>A:</strong> ${escapeHtml(action)} &nbsp; <strong>O:</strong> ${escapeHtml(object)}</div>
+           </td>`;
+        body.appendChild(tr);
+      });
+    }
+
+    function fillAssociationsTableFromMoves(movesData){
+      const body=document.getElementById('assocBody');
+      if(!movesData.length){ body.innerHTML='<tr><td colspan="6">Καμία κίνηση ακόμα…</td></tr>'; return; }
+      body.innerHTML='';
+
+      const locusKey   = (document.getElementById('assocLocusSelect')||{}).value;
+      const piecesKey  = (document.getElementById('assocPiecesSelect')||{}).value;
+      const targetsKey = (document.getElementById('assocTargetsSelect')||{}).value;
+
+      const L1=(libraries[locusKey]||{});
+      const L5=(libraries[piecesKey]||{});
+      const L6=(libraries[targetsKey]||{});
+      const L1Count=Object.keys(L1).length||0;
+
+      // state: ποια «ετικέτα» κάθεται σε ποιο τετράγωνο
+      const assocBySquare=Object.create(null);
+      // Υποστήριξη και για libs τύπου "Ra1" / "R" / "a1"
+      const getAssocFor=(u,fromSq)=>{
+        return L5[u+(fromSq||'')] || L5[fromSq||''] || L5[u] || pieceLetterToGreekName(u);
+      };
+
+      movesData.forEach(m=>{
+        const idx=L1Count?((m.movePair-1)%L1Count)+1:m.movePair;
+        const locus=L1[String(idx)]||'';
+        const locusDisp=locus?`${idx} — ${locus}`:String(idx);
+        const u=(m.piece||'').toUpperCase();
+
+        // πάρε/φτιάξε την ετικέτα από το from
+        let pieceAssoc = assocBySquare[m.from] || getAssocFor(u, m.from);
+
+        // άδειασε το from
+        if(m.from) delete assocBySquare[m.from];
+
+        // ροκέ: μετακίνησε και την ετικέτα του πύργου
+        const sanClean=(m.san||'').replace(/[+#?!]+/g,'');
+        if(sanClean.startsWith('O-O')){
+          const long=sanClean.startsWith('O-O-O');
+          const white=(m.side==='White');
+          const rookFrom = white ? (long ? 'a1':'h1') : (long ? 'a8':'h8');
+          const rookTo   = white ? (long ? 'd1':'f1') : (long ? 'd8':'f8');
+          if(assocBySquare[rookFrom]){
+            assocBySquare[rookTo]=assocBySquare[rookFrom];
+            delete assocBySquare[rookFrom];
+          }else{
+            assocBySquare[rookTo]=getAssocFor('R',rookFrom);
+          }
+        }
+
+        // κάθισε την ίδια ετικέτα στο to (αντικαθιστά ό,τι υπήρχε σε capture)
+        assocBySquare[m.to]=pieceAssoc;
+
+        const toDesc=L6[m.to]||m.to;
+        const tr=document.createElement('tr'); tr.setAttribute('data-index',String(m.index));
+        tr.innerHTML=
+          `<td>${escapeHtml(m.moveNumDisplay)}</td>`+
+          `<td>${escapeHtml(m.san)}</td>`+
+          `<td>${escapeHtml(m.side)}</td>`+
+          `<td style="text-align:left">${escapeHtml(locusDisp)}</td>`+
+          `<td style="text-align:left">${escapeHtml(pieceAssoc)}</td>`+
+          `<td style="text-align:left">${escapeHtml(toDesc)}</td>`;
+        body.appendChild(tr);
+      });
+    }
+
+    /* -------------------------- Row events -------------------------- */
+    function attachRowEvents(){
+      const getRows=(idx)=>({
+        san:document.querySelector(`#sanBody tr[data-index="${idx}"]`),
+        pao:document.querySelector(`#paoBody tr[data-index="${idx}"]`),
+        assoc:document.querySelector(`#assocBody tr[data-index="${idx}"]`)
+      });
+      function highlight(idx,add,cls){
+        const rs=getRows(idx);
+        ['san','pao','assoc'].forEach(k=>{if(rs[k]) rs[k].classList[add?'add':'remove'](cls);});
+      }
+      function bind(sel){
+        document.querySelectorAll(`${sel} tr[data-index]`).forEach(tr=>{
+          const idx=tr.getAttribute('data-index');
+          tr.onmouseenter=()=>highlight(idx,true,'row-hover');
+          tr.onmouseleave=()=>highlight(idx,false,'row-hover');
+          tr.onclick=()=>{
+            document.querySelectorAll('tr.row-selected').forEach(r=>r.classList.remove('row-selected'));
+            highlight(idx,true,'row-selected');
+          };
+        });
+      }
+      bind('#sanBody'); bind('#paoBody'); bind('#assocBody');
+    }
+
+    /* -------------------------- Actions -------------------------- */
+    function renderAllTables(){
+      fillSanTable(lastMovesData);
+      fillPaoTableFromMoves(lastMovesData);
+      fillAssociationsTableFromMoves(lastMovesData);
+      attachRowEvents();
+    }
+
+    function parseFromTextarea(){
+      if(!libraries){ console.warn('Libraries not loaded yet'); return; }
+      const text=document.getElementById('pgnText').value.trim();
+      const pgn=cleanPGN(text);
+      lastMovesData=buildMovesDataFromPGN(pgn);
+      renderAllTables();
+    }
+
+    document.getElementById('btnParse').addEventListener('click',parseFromTextarea);
+    document.getElementById('btnClear').addEventListener('click',()=>{
+      document.getElementById('pgnText').value='';
+      lastMovesData=[];
+      document.getElementById('sanBody').innerHTML='<tr><td colspan="6">Καμία κίνηση ακόμα…</td></tr>';
+      document.getElementById('paoBody').innerHTML='<tr><td colspan="5">Καμία κίνηση ακόμα…</td></tr>';
+      document.getElementById('assocBody').innerHTML='<tr><td colspan="6">Καμία κίνηση ακόμα…</td></tr>';
+    });
+
+    document.getElementById('pgnFile').addEventListener('change',(ev)=>{
+      const f=ev.target.files&&ev.target.files[0]; if(!f) return;
+      const reader=new FileReader();
+      reader.onload=(e)=>{ document.getElementById('pgnText').value=e.target.result; parseFromTextarea(); };
+      reader.readAsText(f,'utf-8');
+    });
+
+    /* ----------------------- Εκκίνηση ----------------------- */
+    window.addEventListener('load',()=>{
+      loadLibraries().then(()=>{
+        initDropdowns();
+        parseFromTextarea();
+      });
+    });
+
+    /* ----------------------- CSV Export ----------------------- */
+    function downloadTableAsCSV(tableId, filename) {
+      const table = document.getElementById(tableId);
+      if (!table) return;
+      let csv = [];
+      for (let row of table.rows) {
+        let cols = [...row.cells].map(td => `"${td.innerText.replace(/"/g, '""')}"`);
+        csv.push(cols.join(","));
+      }
+      const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+    }
+    
+    /* ----------------------- Sync Scroll ----------------------- */
+function syncScroll(source, targets){
+  source.addEventListener('scroll', () => {
+    targets.forEach(t => {
+      if (t !== source) t.scrollTop = source.scrollTop;
+    });
+  });
+}
+
+window.addEventListener('load', () => {
+  const san = document.getElementById('sanContainer');
+  const pao = document.getElementById('paoContainer');
+  const assoc = document.getElementById('assocContainer');
+
+  [san, pao, assoc].forEach(el => {
+    syncScroll(el, [san, pao, assoc]);
+  });
+});
+
+  </script>
+</body>
+</html>
+
+
+
+
