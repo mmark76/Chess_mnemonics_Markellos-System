@@ -184,7 +184,7 @@
     let lastMovesData = [];
 
     function loadLibraries(){
-      return fetch('libraries.json')
+      return fetch('libraries_v.2.10.json')
         .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(d=>{
           libraries=d;
@@ -509,6 +509,7 @@ window.addEventListener('load', () => {
   </script>
 </body>
 </html>
+
 
 
 
