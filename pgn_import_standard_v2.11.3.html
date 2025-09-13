@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chess Mnemonic System v.2.11.3 — SAN / PAO (0–9) / PAO (00–99) / Associations</title>
+
+  <!-- Stable chess.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js">
+// ==== Helpers για PAO 00-99 ====
+function sanToTriplet(san, isWhiteHalfMove){
+  const pieceMap={P:1,N:2,B:3,R:4,Q:5,K:6}, fileMap={a:1,b:2,c:3,d:4,e:5,f:6,g:7,h:8};
+  let s=san.replace(/[+#?!]/g,'');
+  if(s==='O-O'||s==='0-0')  return ''+6+7+(isWhiteHalfMove?1:8);
+  if(s==='O-O-O'||s==='0-0-0')return ''+6+3+(isWhiteHalfMove?1:8);
+  let pChar=s[0], pieceCode=pieceMap[pChar]; if(!pieceCode){pieceCode=1;} else { s=s.slice(1); }
+  const sq=s.match(/([a-h][1-8])/); if(!sq) return null;
+  return ''+pieceCode+fileMap[sq[1][0]]+parseInt(sq[1][1],10);
+}
+function splitIntoPairs(six){ return [six.slice(0,2), six.slice(2,4), six.slice(4,6)]; }
+function lookupPAO(book, code){
+  const k=String(code).padStart(2,'0'); const e=book?.[k];
+  return { person: e?.Person||e?.person||'—', action: e?.Action||e?.action||'—', object: e?.Object||e?.object||'—' };
+}
+function getSelectedPAOLibrary(){
+  const sel=document.getElementById('paoLibSel'); 
+  return libs?.PAO?.[sel?.value||'LibraryP2'] || {};
+}
+function fillPaoTable_00_99(moves, library) {
+  let table = document.getElementById("paoTable_00_99").getElementsByTagName("tbody")[0];
+  table.innerHTML = "";
+  for (let i = 0; i < moves.length; i += 2) {
+    let moveNumber = Math.floor(i / 2) + 1;
+    let whiteMove = moves[i];
+    let blackMove = moves[i + 1];
+    let code1 = whiteMove ? sanToTriplet(whiteMove.san, true) : null;
+    let code2 = blackMove ? sanToTriplet(blackMove.san, false) : null;
+    if (code1) {
+      if (!code2) code2 = code1;
+      let combined = code1.toString() + code2.toString();
+      let [personCode, actionCode, objectCode] = splitIntoPairs(combined);
+      let person = lookupPAO(library, personCode).person;
+      let action = lookupPAO(library, actionCode).action;
+      let object = lookupPAO(library, objectCode).object;
+      let paoScene = `${person} ${action} ${object}`;
+      let locus = (window.LinearPalace && window.LinearPalace[String(moveNumber)]) || ("#" + moveNumber);
+      let sanJoined = whiteMove.san + (blackMove ? " " + blackMove.san : "");
+      let row = table.insertRow();
+      row.setAttribute('data-index', String(whiteMove.index));
+      row.insertCell(0).textContent = moveNumber;
+      row.insertCell(1).textContent = sanJoined;
+      row.insertCell(2).textContent = locus;
+      row.insertCell(3).textContent = combined;
+      row.insertCell(4).textContent = `${personCode}-${actionCode}-${objectCode}`;
+      row.insertCell(5).textContent = person;
+      row.insertCell(6).textContent = action;
+      row.insertCell(7).textContent = object;
+      row.insertCell(8).textContent = paoScene;
+    }
+  }
+}
+
+</script>
+
+  <style>
+    :root{
+      --bg:#0b0f14; --card:#121821; --muted:#1a2230; --text:#e6edf3; --sub:#a9b4c0;
+      --acc:#2ea043; --border:#2d3645; --hover:#223043;
+    }
+    html,body{background:var(--bg); color:var(--text); margin:0; font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+    .wrap{width:100%; max-width:none; margin:24px 0; padding:0 16px;}
+    h1{font-size:20px; margin:12px 0 16px}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:6px 0 18px;align-items:start;}
+    textarea{width:100%; min-height:130px; background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:12px; padding:10px; resize:vertical;}
+    #pgnText{ width:90%; }
+    .controls{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+    .btn{background:var(--muted); color:var(--text); border:1px solid var(--border); padding:8px 12px; border-radius:10px; cursor:pointer}
+    .btn:hover{background:var(--hover)}
+    input[type=file]{display:none}
+    label.file{background:var(--muted); padding:8px 12px; border:1px solid var(--border); border-radius:10px; cursor:pointer}
+    .section-title{margin:14px 0 6px}
+
+    .tables{display:grid; grid-template-columns:1fr; gap:12px;}
+    .subtables{display:grid; grid-template-columns: repeat(auto-fit,minmax(360px,1fr)); gap:12px;}
+
+    .table-container{background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:auto; max-height:420px; -webkit-overflow-scrolling:touch}
+    table{width:100%; border-collapse:collapse; min-width:360px; table-layout:fixed}
+    thead{position:sticky; top:0; background:linear-gradient(0deg,var(--card), #0f1621)}
+    th,td{padding:6px 8px; border-bottom:1px solid var(--border); text-align:center; white-space:normal; word-break:break-word;}
+    td.fen, th.fen{max-width:240px;}
+    td:first-child, th:first-child{width:44px}
+    tr.row-hover{background:rgba(46,160,67,0.08)}
+    tr.row-selected{background:rgba(46,160,67,0.18)}
+    .muted{color:var(--sub)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+    .small{font-size:12px}
+    .foot{margin:12px 0 40px; color:var(--sub)}
+    #libsPreview{text-align:left!important; direction:ltr!important; margin:0!important; padding-left:8px; white-space:pre-wrap; word-break:break-word}
+
+    /* Wider columns: readable text */
+    .wide{min-width:150px}
+
+    /* Mobile tweaks */
+    @media (max-width: 540px){
+      html,body{font-size:13px}
+      .row{grid-template-columns:1fr}
+      .subtables{grid-template-columns:1fr}
+      th,td{padding:5px 6px}
+      td.fen, th.fen{max-width:160px}
+    }
+
+    /* Sticky header */
+    .cms-header{position:sticky;top:0;z-index:1000;background:var(--bg);border-bottom:1px solid var(--border);}
+    .cms-header h1{margin:0;padding:12px 16px;font-weight:700;}
+
+    /* Dropdown toolbar */
+    .toolbar{display:flex; gap:10px; align-items:center; background:var(--muted); border:1px solid var(--border); padding:6px 8px; border-radius:10px; margin:6px 0; flex-wrap:wrap;}
+    .toolbar label{display:flex; gap:6px; align-items:center;}
+    .toolbar select{background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:6px 8px;}
+  </style>
+
+  <script>
+    // Καθαρισμός PGN από engine tags {[%evp ...]}, {[%eval ...]}, {[%clk ...]}
+    function cleanPGN(pgn){
+      return pgn.replace(/\{\s*\[%[\s\S]*?\]\s*\}/gi, '').trim();
+    }
+  
+// ==== Helpers για PAO 00-99 ====
+function sanToTriplet(san, isWhiteHalfMove){
+  const pieceMap={P:1,N:2,B:3,R:4,Q:5,K:6}, fileMap={a:1,b:2,c:3,d:4,e:5,f:6,g:7,h:8};
+  let s=san.replace(/[+#?!]/g,'');
+  if(s==='O-O'||s==='0-0')  return ''+6+7+(isWhiteHalfMove?1:8);
+  if(s==='O-O-O'||s==='0-0-0')return ''+6+3+(isWhiteHalfMove?1:8);
+  let pChar=s[0], pieceCode=pieceMap[pChar]; if(!pieceCode){pieceCode=1;} else { s=s.slice(1); }
+  const sq=s.match(/([a-h][1-8])/); if(!sq) return null;
+  return ''+pieceCode+fileMap[sq[1][0]]+parseInt(sq[1][1],10);
+}
+function splitIntoPairs(six){ return [six.slice(0,2), six.slice(2,4), six.slice(4,6)]; }
+function lookupPAO(book, code){
+  const k=String(code).padStart(2,'0'); const e=book?.[k];
+  return { person: e?.Person||e?.person||'—', action: e?.Action||e?.action||'—', object: e?.Object||e?.object||'—' };
+}
+function getSelectedPAOLibrary(){
+  const sel=document.getElementById('paoLibSel'); 
+  return libs?.PAO?.[sel?.value||'LibraryP2'] || {};
+}
+function fillPaoTable_00_99(moves, library) {
+  let table = document.getElementById("paoTable_00_99").getElementsByTagName("tbody")[0];
+  table.innerHTML = "";
+  for (let i = 0; i < moves.length; i += 2) {
+    let moveNumber = Math.floor(i / 2) + 1;
+    let whiteMove = moves[i];
+    let blackMove = moves[i + 1];
+    let code1 = whiteMove ? sanToTriplet(whiteMove.san, true) : null;
+    let code2 = blackMove ? sanToTriplet(blackMove.san, false) : null;
+    if (code1) {
+      if (!code2) code2 = code1;
+      let combined = code1.toString() + code2.toString();
+      let [personCode, actionCode, objectCode] = splitIntoPairs(combined);
+      let person = lookupPAO(library, personCode).person;
+      let action = lookupPAO(library, actionCode).action;
+      let object = lookupPAO(library, objectCode).object;
+      let paoScene = `${person} ${action} ${object}`;
+      let locus = (window.LinearPalace && window.LinearPalace[String(moveNumber)]) || ("#" + moveNumber);
+      let sanJoined = whiteMove.san + (blackMove ? " " + blackMove.san : "");
+      let row = table.insertRow();
+      row.setAttribute('data-index', String(whiteMove.index));
+      row.insertCell(0).textContent = moveNumber;
+      row.insertCell(1).textContent = sanJoined;
+      row.insertCell(2).textContent = locus;
+      row.insertCell(3).textContent = combined;
+      row.insertCell(4).textContent = `${personCode}-${actionCode}-${objectCode}`;
+      row.insertCell(5).textContent = person;
+      row.insertCell(6).textContent = action;
+      row.insertCell(7).textContent = object;
+      row.insertCell(8).textContent = paoScene;
+    }
+  }
+}
+
+</script>
+</head>
+
+<body>
+  <div class="wrap">
+<header class="cms-header">
+  <h1 style="display:inline-block; margin-right:20px;">
+    Chess Mnemonic System v.2.11.3 — SAN / PAO (0–9) / PAO (00–99) / Associations
+  </h1>
+  <div style="display:inline-block;">
+    <button class="btn" onclick="downloadTableAsCSV('sanTable','san_v2113.csv')">Download SAN</button>
+    <button class="btn" onclick="downloadTableAsCSV('paoTable','pao_0-9_v2113.csv')">Download PAO 0–9</button>
+    <button class="btn" onclick="downloadTableAsCSV('paoTable_00_99','pao_00-99_v2113.csv')">Download PAO 00–99</button>
+    <button class="btn" onclick="downloadTableAsCSV('assocTable','assoc_v2113.csv')">Download Associations</button>
+  </div>
+</header>
+    <div class="row">
+      <div>
+        <div class="controls" style="margin-bottom:6px">
+          <label class="file" title="Φόρτωση αρχείου .pgn ή .txt">
+            <input id="pgnFile" type="file" accept=".pgn,.txt"/>
+            Import PGN / SAN
+          </label>
+          <button class="btn" id="btnParse" title="Κάνει parse του κειμένου στο πεδίο">Parse PGN / SAN</button>
+          <button class="btn" id="btnClear">Καθαρισμός</button>
+        </div>
+        <textarea id="pgnText" placeholder="Paste PGN/SAN εδώ και πάτα ‘Parse PGN / SAN’, ή χρησιμοποίησε ‘Import PGN / SAN’ για φόρτωση αρχείου." style="width:90%; min-height:300px;">Paste PGN/SAN εδώ και πάτα «Parse PGN / SAN». Εναλλακτικά, χρησιμοποίησε «Import PGN / SAN» για να φορτώσεις αρχείο.</textarea>
+      </div>
+      <div>
+        <div class="section-title">
+          <h3 style="padding:10px auto;">Βιβλιοθήκες (libraries_v2.11.3_bilingual.json)</h3>
+          <div class="table-container" id="libsContainer" style="padding:10px; max-height:300px; max-width:520px; margin:0; overflow:auto;">
+            <pre id="libsPreview" class="small"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tables">
+      <!-- SAN Table -->
+      <div>
+        <div class="section-title"><h3>SAN Table</h3></div>
+        <!-- Toolbar πάνω από SAN -->
+        <div class="toolbar">
+          <label> Locus (Αριθμός – Θέση Κίνησης):
+            <select id="sanLocusSelect"></select>
+          </label>
+          <label> Anchor (Άγκυρα – Κρίσιμες Κινήσεις):
+            <select id="sanAnchorSelect"></select>
+          </label>
+        </div>
+        <div id="sanContainer" class="table-container">
+          <table id="sanTable">
+            <thead>
+              <tr>
+                <th>#</th><th>SAN</th><th>Side</th>
+                <th class="wide">Locus</th><th class="wide">Anchor</th>
+                <th>Piece / Pawn</th><th class="wide">Target Square</th>
+                <th class="fen">FEN</th>
+              </tr>
+            </thead>
+            <tbody id="sanBody"><tr><td colspan="8">Καμία κίνηση ακόμα…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PAO 0–9 + Associations -->
+      <div class="subtables">
+        <div>
+          <div class="section-title"><h3>Πίνακας PAO (0–9)</h3></div>
+          <!-- Toolbar πάνω από PAO 0–9 -->
+          <div class="toolbar">
+            <label>Locus (Αριθμός – Θέση Κίνησης):
+              <select id="paoLocusSelect"></select>
+            </label>
+            <label>Anchor (Άγκυρα – Κρίσιμες Κινήσεις):
+              <select id="paoAnchorSelect"></select>
+            </label>
+            <label>PAO codes (Κωδικοί PAO 0–9):
+              <select id="paoCodesSelect"></select>
+            </label>
+          </div>
+          <div id="paoContainer" class="table-container">
+            <table id="paoTable">
+              <thead><tr>
+                <th>#</th><th>SAN</th><th>Side</th>
+                <th class="wide">Locus</th><th class="wide">Anchor</th>
+                <th class="wide">PAO</th>
+              </tr></thead>
+              <tbody id="paoBody"><tr><td colspan="6">Καμία κίνηση ακόμα…</td></tr></tbody>
+            </table>
+<!-- παλιός πίνακας PAO κλείνει -->
+
+<!-- === Νέος πίνακας PAO 00–99 === -->
+<h3>PAO 00–99</h3>
+
+<div style="margin:12px 0;">
+  <label for="paoLibSel"><b>PAO Library:</b></label>
+  <select id="paoLibSel">
+    <option value="LibraryP2">LibraryP2 (International Dominic)</option>
+    <option value="LibraryP3">LibraryP3 (Greek Alternative)</option>
+  </select>
+</div>
+
+<table id="paoTable_00_99" border="1" cellspacing="0" cellpadding="6" 
+       style="width:100%; border-collapse:collapse; text-align:center;">
+  <thead>
+    <tr>
+      <th>Move</th>
+      <th>SAN</th>
+      <th>Locus</th>
+      <th>6-digit</th>
+      <th>Split (P-A-O)</th>
+      <th>Person</th>
+      <th>Action</th>
+      <th>Object</th>
+      <th>PAO Scene</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+		  </div>
+        </div>
+
+        <div>
+          <div class="section-title"><h3>Πίνακας Associations</h3></div>
+          <!-- Toolbar πάνω από Associations -->
+          <div class="toolbar">
+            <label>Locus (Αριθμός – Θέση Κίνησης):
+              <select id="assocLocusSelect"></select>
+            </label>
+            <label>Anchor (Άγκυρα – Κρίσιμες Κινήσεις):
+              <select id="assocAnchorSelect"></select>
+            </label>
+            <label>Characters (Χαρακτήρες – Κομμάτια & Πιόνια):
+              <select id="assocCharactersSelect"></select>
+            </label>
+            <label>Targets (Στόχος – Τετράγωνο):
+              <select id="assocTargetsSelect"></select>
+            </label>
+          </div>
+          <div id="assocContainer" class="table-container">
+            <table id="assocTable">
+              <thead><tr>
+                <th>#</th><th>SAN</th><th>Side</th>
+                <th class="wide">Locus</th><th class="wide">Anchor</th>
+                <th class="wide">Characters</th><th class="wide">Target Square</th>
+              </tr></thead>
+              <tbody id="assocBody"><tr><td colspan="7">Καμία κίνηση ακόμα…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Νέος πίνακας: PAO 00–99 -->
+      <div>
+        
+      </div>
+    </div>
+
+    <div class="foot small">Chess Mnemonic System v.2.11.3 @Markellos Markides 2025</div>
+  </div>
+
+  <script>
+    /* --------------------- Φόρτωση Libraries --------------------- */
+    let libs = null;
+    let lastMovesData = [];
+
+    async function loadLibraries(){
+      try{
+        const r = await fetch('libraries_v2.11.3_bilingual.json');
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        libs = await r.json();
+        const jsonString = JSON.stringify(libs,null,2).replace(/[\u202A-\u202E\u200E\u200F\uFEFF]/g,'');
+        document.getElementById('libsPreview').textContent=jsonString;
+      }catch(err){
+        console.error('libraries load failed',err);
+        document.getElementById('libsPreview').textContent='Αποτυχία φόρτωσης libraries_v2.11.3_bilingual.json';
+      }
+    }
+
+    /* ---------------------------- Helpers ---------------------------- */
+    function escapeHtml(s){
+      return (s==null?'':String(s)).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
+    }
+    function formatBilingual(val){
+      if(val==null) return '';
+      if(typeof val==='string') return val;
+      const el = (val.el ?? '').trim();
+      const en = (val.en ?? '').trim();
+      if(!el && !en) return '';
+      if(el && en && el!==en) return `${el} (${en})`;
+      return el || en;
+    }
+    function fenPieceAt(fen,sq){
+      if(!fen||!/^[a-h][1-8]$/.test(sq)) return null;
+      const board=fen.split(' ')[0], rows=board.split('/');
+      const fileIdx=sq.charCodeAt(0)-97, rankIdx=8-parseInt(sq[1],10);
+      let col=0;
+      for(const ch of rows[rankIdx]){
+        if(/\d/.test(ch)) col+=+ch; else { if(col===fileIdx) return ch; col++; }
+      }
+      return null;
+    }
+    function pieceLetterToName(u){
+      const L={P:'Pawn (Πιόνι)',N:'Knight (Ιππότης)',B:'Bishop (Αξιωματικός)',R:'Rook (Πύργος)',Q:'Queen (Βασίλισσα)',K:'King (Βασιλιάς)'};
+      return L[u]||u;
+    }
+    function zero2(n){
+      n = Number(n)||0;
+      n = n % 100;
+      return n<10 ? '0'+n : String(n);
+    }
+
+    // Temporal mapping
+    function locusForMovePair(movePair){
+      const L1 = libs?.Temporal?.LibraryT1 || {};
+      const keys = Object.keys(L1).map(k=>+k).sort((a,b)=>a-b);
+      if(!keys.length) return '';
+      const idx = ((movePair-1) % keys.length) + 1;
+      const val = L1[String(idx)];
+      return `${idx} — ${formatBilingual(val)}`;
+    }
+    function anchorForMovePair(movePair){
+      const L2 = libs?.Temporal?.LibraryT2 || {};
+      const keys = Object.keys(L2).map(k=>+k).sort((a,b)=>a-b);
+      if(!keys.length) return '';
+      if(movePair%7!==0) return '—'; // μόνο σε κρίσιμες (7,14,21...)
+      const block = Math.floor(movePair/7); // 7→1, 14→2 ...
+      const idx = ((block-1) % keys.length) + 1;
+      const val = L2[String(idx)];
+      return `${block}×7 — ${formatBilingual(val)}`;
+    }
+
+    // CSV export
+    function downloadTableAsCSV(tableId, filename){
+      const table=document.getElementById(tableId);
+      if(!table) return;
+      let csv='';
+      const rows=table.querySelectorAll('tr');
+      rows.forEach(row=>{
+        const cells=row.querySelectorAll('th,td');
+        const arr=[];
+        cells.forEach(c=>{
+          let t=(c.innerText||'').replace(/\s+/g,' ').trim();
+          if(t.includes('"')||t.includes(',')||t.includes('\n')) t='"'+t.replace(/"/g,'""')+'"';
+          arr.push(t);
+        });
+        csv+=arr.join(',')+'\n';
+      });
+      const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download=filename||'table.csv';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    /* ---------------------------- PGN → Moves ---------------------------- */
+    function buildMovesDataFromPGN(pgn){
+      if(typeof Chess==='undefined'){ console.error('Chess.js δεν φορτώθηκε'); return []; }
+      const chess=new Chess();
+      try{ chess.reset(); chess.load_pgn(pgn,{sloppy:true}); }catch(e){ console.warn('load_pgn error',e); }
+      const hist=chess.history({verbose:true}), movesData=[], temp2=new Chess();
+      for(let i=0;i<hist.length;i++){
+        const mv=hist[i];
+        temp2.move(mv);
+        const fen=temp2.fen();
+        const index=i, movePair=Math.floor(i/2)+1;
+        const side=(i%2===0)?'White':'Black', moveNumDisplay=(i%2===0)?(movePair+'.'):(movePair+'...');
+        const piece=(mv.piece||'').toUpperCase();
+        const from=mv.from||''; const to=mv.to||'';
+        movesData.push({index,movePair,moveNumDisplay,san:mv.san,side,piece,from,to,fen});
+      }
+      return movesData;
+    }
+
+    /* ---------------------------- Fill Tables ---------------------------- */
+    function fillSanTable(movesData){
+      const body=document.getElementById('sanBody');
+      if(!movesData.length){ body.innerHTML='<tr><td colspan="8">Καμία κίνηση ακόμα…</td></tr>'; return; }
+      body.innerHTML='';
+      movesData.forEach(m=>{
+        const locus = locusForMovePair(m.movePair);
+        const anchor = anchorForMovePair(m.movePair);
+        const toDesc = formatBilingual(libs?.Spatial?.LibraryS1?.[m.to]) || m.to;
+        const tr=document.createElement('tr'); tr.setAttribute('data-index',String(m.index));
+        tr.innerHTML=
+          `<td>${escapeHtml(m.moveNumDisplay)}</td>`+
+          `<td>${escapeHtml(m.san)}</td>`+
+          `<td>${escapeHtml(m.side)}</td>`+
+          `<td class="wide" style="text-align:left">${escapeHtml(locus)}</td>`+
+          `<td class="wide" style="text-align:left">${escapeHtml(anchor)}</td>`+
+          `<td>${escapeHtml(pieceLetterToName(m.piece))}</td>`+
+          `<td class="wide" style="text-align:left">${escapeHtml(toDesc)}</td>`+
+          `<td class="fen mono small">${escapeHtml(m.fen)}</td>`;
+        body.appendChild(tr);
+      });
+    }
+
+    function fillPaoTable_0_9(movesData){
+      const body=document.getElementById('paoBody');
+      if(!movesData.length){ body.innerHTML='<tr><td colspan="6">Καμία κίνηση ακόμα…</td></tr>'; return; }
+      body.innerHTML='';
+
+      const L7 = libs?.PAO?.LibraryP1 || {}; // Persons/Actions/Objects 0-9
+      const persons=L7.Persons||{}, actions=L7.Actions||{}, objects=L7.Objects||{};
+
+      const pieceMap={P:'1',N:'2',B:'3',R:'4',Q:'5',K:'6'};
+      const fileMap ={a:'1',b:'2',c:'3',d:'4',e:'5',f:'6',g:'7',h:'8'};
+
+      movesData.forEach(m=>{
+        const p=pieceMap[m.piece]||'0';
+        const f=fileMap[m.to[0]]||'0';
+        const r=m.to[1]||'0';
+
+        const locus=locusForMovePair(m.movePair);
+        const anchor=anchorForMovePair(m.movePair);
+        const person=persons[p]||'';
+        const action=actions[f]||'';
+        const object=objects[r]||'';
+
+        const tr=document.createElement('tr'); tr.setAttribute('data-index',String(m.index));
+        tr.innerHTML=
+          `<td>${escapeHtml(m.moveNumDisplay)}</td>`+
+          `<td>${escapeHtml(m.san)}</td>`+
+          `<td>${escapeHtml(m.side)}</td>`+
+          `<td class="wide" style="text-align:left">${escapeHtml(locus)}</td>`+
+          `<td class="wide" style="text-align:left">${escapeHtml(anchor)}</td>`+
+          `<td class="wide" style="text-align:left">
+             <div><strong>Κωδικός:</strong> ${escapeHtml(p+f+r)} <span class="muted small">(${escapeHtml(m.piece+m.to)})</span></div>
+             <div><strong>P:</strong> ${escapeHtml(person)} &nbsp; <strong>A:</strong> ${escapeHtml(action)} &nbsp; <strong>O:</strong> ${escapeHtml(object)}</div>
+           </td>`;
+        body.appendChild(tr);
+      });
+    }
+
+    function fillAssociationsTable(movesData){
+      const body=document.getElementById('assocBody');
+      if(!movesData.length){ body.innerHTML='<tr><td colspan="7">Καμία κίνηση ακόμα…</td></tr>'; return; }
+      body.innerHTML='';
+
+      const L5 = libs?.Characters?.LibraryC1 || {};
+      const L6 = libs?.Spatial?.LibraryS1 || {};
+
+      const assocBySquare=Object.create(null);
+
+      const getAssocFor=(u,fromSq)=>{
+        // προτεραιότητα: Ra1 / a1 / R / default name
+        return L5[u+(fromSq||'')] || L5[fromSq||''] || L5[u] || pieceLetterToName(u);
+      };
+
+      movesData.forEach(m=>{
+        const locus=locusForMovePair(m.movePair);
+        const anchor=anchorForMovePair(m.movePair);
+        const u=(m.piece||'').toUpperCase();
+
+        // piece label from previous square or mapping
+        let pieceAssoc = assocBySquare[m.from] || getAssocFor(u, m.from);
+        if(m.from) delete assocBySquare[m.from];
+
+        // handle castling rook move
+        const sanClean=(m.san||'').replace(/[+#?!]+/g,'');
+        if(sanClean.startsWith('O-O')){
+          const long=sanClean.startsWith('O-O-O');
+          const white=(m.side==='White');
+          const rookFrom = white ? (long ? 'a1':'h1') : (long ? 'a8':'h8');
+          const rookTo   = white ? (long ? 'd1':'f1') : (long ? 'd8':'f8');
+          if(assocBySquare[rookFrom]){
+            assocBySquare[rookTo]=assocBySquare[rookFrom];
+            delete assocBySquare[rookFrom];
+          }else{
+            assocBySquare[rookTo]=getAssocFor('R',rookFrom);
+          }
+        }
+
+        assocBySquare[m.to]=pieceAssoc;
+
+        const toDesc=formatBilingual(L6[m.to]) || m.to;
+        const charDisp = (typeof pieceAssoc==='object') ? formatBilingual(pieceAssoc) : pieceAssoc;
+
+        const tr=document.createElement('tr'); tr.setAttribute('data-index',String(m.index));
+        tr.innerHTML=
+          `<td>${escapeHtml(m.moveNumDisplay)}</td>`+
+          `<td>${escapeHtml(m.san)}</td>`+
+          `<td>${escapeHtml(m.side)}</td>`+
+          `<td class="wide" style="text-align:left">${escapeHtml(locus)}</td>`+
+          `<td class="wide" style="text-align:left">${escapeHtml(anchor)}</td>`+
+          `<td class="wide" style="text-align:left">${escapeHtml(charDisp)}</td>`+
+          `<td class="wide" style="text-align:left">${escapeHtml(toDesc)}</td>`;
+        body.appendChild(tr);
+      });
+    }
+
+function fillPaoTable_00_99(moves, library) {
+  let table = document.getElementById("paoTable_00_99").getElementsByTagName("tbody")[0];
+  table.innerHTML = "";
+
+  for (let i = 0; i < moves.length; i += 2) {
+    let moveNumber = Math.floor(i / 2) + 1;
+
+    let whiteMove = moves[i];
+    let blackMove = moves[i + 1];
+
+    // Βγάλε τριψήφιους από το SAN
+    let code1 = whiteMove ? sanToTriplet(whiteMove.san, true) : null;
+    let code2 = blackMove ? sanToTriplet(blackMove.san, false) : null;
+
+    if (code1) {
+      if (!code2) code2 = code1; // mirror αν λείπει ο μαύρος
+
+      // Ένωσε → 6ψήφιο
+      let combined = code1.toString() + code2.toString();
+
+      // Σπάσε σε 3 διψήφιους
+      let [personCode, actionCode, objectCode] = splitIntoPairs(combined);
+
+      // Lookup στη βιβλιοθήκη (P2/P3)
+      let person = lookupPAO(library, personCode).person;
+      let action = lookupPAO(library, actionCode).action;
+      let object = lookupPAO(library, objectCode).object;
+
+      // Σκηνή PAO
+      let paoScene = `${person} ${action} ${object}`;
+
+      // Locus (Linear Palace ή #moveNo)
+      let locus = (window.LinearPalace && window.LinearPalace[String(moveNumber)]) || ("#" + moveNumber);
+
+      // SAN string
+      let sanJoined = whiteMove.san + (blackMove ? " " + blackMove.san : "");
+
+      // Γέμισε πίνακα
+      let row = table.insertRow();
+      row.insertCell(0).textContent = moveNumber;
+      row.insertCell(1).textContent = sanJoined;
+      row.insertCell(2).textContent = locus;
+      row.insertCell(3).textContent = combined;
+      row.insertCell(4).textContent = `${personCode}-${actionCode}-${objectCode}`;
+      row.insertCell(5).textContent = person;
+      row.insertCell(6).textContent = action;
+      row.insertCell(7).textContent = object;
+      row.insertCell(8).textContent = paoScene;
+    }
+  }
+}
+
+
+        // Προσπάθεια εμφάνισης πεδίων αν υπάρχουν (letters/person/occupation/action/object)
+        const letters = entry.letters || entry.Letters || '';
+        const person  = entry.person  || entry.Person  || '';
+        const action  = entry.action  || entry.Action  || '';
+        const object  = entry.object  || entry.Object  || '';
+
+        const details = (person||action||object) ?
+          `<div><strong>P:</strong> ${escapeHtml(person)} &nbsp; <strong>A:</strong> ${escapeHtml(action)} &nbsp; <strong>O:</strong> ${escapeHtml(object)}</div>`
+          : `<div class="muted">—</div>`;
+
+        const tr=document.createElement('tr'); tr.setAttribute('data-index',String(m.index));
+        tr.innerHTML=
+          `<td>${escapeHtml(m.moveNumDisplay)}</td>`+
+          `<td>${escapeHtml(m.san)}</td>`+
+          `<td>${escapeHtml(m.side)}</td>`+
+          `<td class="wide" style="text-align:left">${escapeHtml(locus)}</td>`+
+          `<td class="wide" style="text-align:left">${escapeHtml(anchor)}</td>`+
+          `<td>${escapeHtml(code)}</td>`+
+          `<td class="wide" style="text-align:left">
+             ${letters ? `<div class="small muted">Letters: ${escapeHtml(letters)}</div>` : ''}
+             ${details}
+           </td>`;
+        body.appendChild(tr);
+      });
+    }
+
+    /* -------------------------- Row events -------------------------- */
+    function attachRowEvents(){
+      const getRows=(idx)=>({
+        san:document.querySelector(`#sanBody tr[data-index="${idx}"]`),
+        pao:document.querySelector(`#paoBody tr[data-index="${idx}"]`),
+        assoc:document.querySelector(`#assocBody tr[data-index="${idx}"]`),
+        pao99:document.querySelector(`#paoTable_00_99 tbody tr[data-index=\"${idx}\"]`)
+      });
+      function highlight(idx,add,cls){
+        const rs=getRows(idx);
+        ['san','pao','assoc','pao99'].forEach(k=>{if(rs[k]) rs[k].classList[add?'add':'remove'](cls);});
+      }
+      function bind(sel){
+        document.querySelectorAll(`${sel} tr[data-index]`).forEach(tr=>{
+          const idx=tr.getAttribute('data-index');
+          tr.onmouseenter=()=>highlight(idx,true,'row-hover');
+          tr.onmouseleave=()=>highlight(idx,false,'row-hover');
+          tr.onclick=()=>{
+            document.querySelectorAll('tr.row-selected').forEach(r=>r.classList.remove('row-selected'));
+            highlight(idx,true,'row-selected');
+          };
+        });
+      }
+      bind('#sanBody'); bind('#paoBody'); bind('#assocBody'); bind('#paoTable_00_99 tbody');
+    }
+
+    /* ---------------------------- Init selects ---------------------------- */
+    function populateSelect(el, keys, preferred){
+      el.innerHTML='';
+      keys.forEach(k=>{ const o=document.createElement('option'); o.value=k; o.textContent=k; el.appendChild(o); });
+      if(preferred && keys.includes(preferred)) el.value=preferred;
+    }
+
+    function initDropdowns(){
+      // Temporal: LibraryT1 / LibraryT2
+      const t1 = libs?.Temporal?.LibraryT1 ? ['LibraryT1'] : [];
+      const t2 = libs?.Temporal?.LibraryT2 ? ['LibraryT2'] : [];
+      const p1 = libs?.PAO?.LibraryP1 ? ['LibraryP1'] : [];
+
+      // SAN
+      populateSelect(document.getElementById('sanLocusSelect'), t1, 'LibraryT1');
+      populateSelect(document.getElementById('sanAnchorSelect'), t2, 'LibraryT2');
+      // PAO 0–9
+      populateSelect(document.getElementById('paoLocusSelect'), t1, 'LibraryT1');
+      populateSelect(document.getElementById('paoAnchorSelect'), t2, 'LibraryT2');
+      populateSelect(document.getElementById('paoCodesSelect'), p1, 'LibraryP1');
+      // Associations
+      populateSelect(document.getElementById('assocLocusSelect'), t1, 'LibraryT1');
+      populateSelect(document.getElementById('assocAnchorSelect'), t2, 'LibraryT2');
+      populateSelect(document.getElementById('assocCharactersSelect'), libs?.Characters?.LibraryC1?['LibraryC1']:['—'], 'LibraryC1');
+      populateSelect(document.getElementById('assocTargetsSelect'), libs?.Spatial?.LibraryS1?['LibraryS1']:['—'], 'LibraryS1');
+      // PAO 00–99
+      populateSelect(document.getElementById('pao99LocusSelect'), t1, 'LibraryT1');
+      populateSelect(document.getElementById('pao99AnchorSelect'), t2, 'LibraryT2');
+    }
+
+
+    /* ---------------------------- Parse helper ---------------------------- */
+    function parseFromTextarea(){
+      const raw = (document.getElementById('pgnText')||{}).value || '';
+      const pgn = cleanPGN(raw);
+      lastMovesData = buildMovesDataFromPGN(pgn);
+      renderAllTables();
+    }
+
+    /* ---------------------------- Render ---------------------------- */
+    function renderAllTables(){
+      fillSanTable(lastMovesData);
+      fillPaoTable_0_9(lastMovesData);
+      fillAssociationsTable(lastMovesData);
+      fillPaoTable_00_99(lastMovesData);
+      attachRowEvents();
+    }
+
+    
+    /* ---------------------------- Boot ---------------------------- */
+    (function boot(){
+      loadLibraries().then(()=>{
+        initDropdowns();
+        // initial parse (textarea may already contain PGN)
+        parseFromTextarea();
+        // re-render when any select changes
+        [
+          'sanLocusSelect','sanAnchorSelect',
+          'paoLocusSelect','paoAnchorSelect','paoCodesSelect',
+          'assocLocusSelect','assocAnchorSelect','assocCharactersSelect','assocTargetsSelect',
+          'paoLibSel'
+        ].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('change', renderAllTables); });
+      });
+
+      const fEl = document.getElementById('pgnFile');
+      if(fEl){
+        fEl.addEventListener('change',e=>{
+          const f=e.target.files && e.target.files[0]; if(!f) return;
+          const rd=new FileReader();
+          rd.onload=()=>{ document.getElementById('pgnText').value=rd.result; parseFromTextarea(); };
+          rd.readAsText(f,'utf-8');
+        });
+      }
+      const parseBtn = document.getElementById('btnParse');
+      if(parseBtn) parseBtn.addEventListener('click', parseFromTextarea);
+
+      const clearBtn = document.getElementById('btnClear');
+      if(clearBtn){
+        clearBtn.addEventListener('click',()=>{
+          document.getElementById('pgnText').value='';
+          lastMovesData=[];
+          document.getElementById('sanBody').innerHTML='<tr><td colspan="8">Καμία κίνηση ακόμα…</td></tr>';
+          document.getElementById('paoBody').innerHTML='<tr><td colspan="6">Καμία κίνηση ακόμα…</td></tr>';
+          document.getElementById('assocBody').innerHTML='<tr><td colspan="7">Καμία κίνηση ακόμα…</td></tr>';
+          document.querySelector('#paoTable_00_99 tbody').innerHTML='<tr><td colspan=\"9\">Καμία κίνηση ακόμα…</td></tr>';
+        });
+      }
+    })();
+  
+// ==== Helpers για PAO 00-99 ====
+function sanToTriplet(san, isWhiteHalfMove){
+  const pieceMap={P:1,N:2,B:3,R:4,Q:5,K:6}, fileMap={a:1,b:2,c:3,d:4,e:5,f:6,g:7,h:8};
+  let s=san.replace(/[+#?!]/g,'');
+  if(s==='O-O'||s==='0-0')  return ''+6+7+(isWhiteHalfMove?1:8);
+  if(s==='O-O-O'||s==='0-0-0')return ''+6+3+(isWhiteHalfMove?1:8);
+  let pChar=s[0], pieceCode=pieceMap[pChar]; if(!pieceCode){pieceCode=1;} else { s=s.slice(1); }
+  const sq=s.match(/([a-h][1-8])/); if(!sq) return null;
+  return ''+pieceCode+fileMap[sq[1][0]]+parseInt(sq[1][1],10);
+}
+function splitIntoPairs(six){ return [six.slice(0,2), six.slice(2,4), six.slice(4,6)]; }
+function lookupPAO(book, code){
+  const k=String(code).padStart(2,'0'); const e=book?.[k];
+  return { person: e?.Person||e?.person||'—', action: e?.Action||e?.action||'—', object: e?.Object||e?.object||'—' };
+}
+function getSelectedPAOLibrary(){
+  const sel=document.getElementById('paoLibSel'); 
+  return libs?.PAO?.[sel?.value||'LibraryP2'] || {};
+}
+function fillPaoTable_00_99(moves, library) {
+  let table = document.getElementById("paoTable_00_99").getElementsByTagName("tbody")[0];
+  table.innerHTML = "";
+  for (let i = 0; i < moves.length; i += 2) {
+    let moveNumber = Math.floor(i / 2) + 1;
+    let whiteMove = moves[i];
+    let blackMove = moves[i + 1];
+    let code1 = whiteMove ? sanToTriplet(whiteMove.san, true) : null;
+    let code2 = blackMove ? sanToTriplet(blackMove.san, false) : null;
+    if (code1) {
+      if (!code2) code2 = code1;
+      let combined = code1.toString() + code2.toString();
+      let [personCode, actionCode, objectCode] = splitIntoPairs(combined);
+      let person = lookupPAO(library, personCode).person;
+      let action = lookupPAO(library, actionCode).action;
+      let object = lookupPAO(library, objectCode).object;
+      let paoScene = `${person} ${action} ${object}`;
+      let locus = (window.LinearPalace && window.LinearPalace[String(moveNumber)]) || ("#" + moveNumber);
+      let sanJoined = whiteMove.san + (blackMove ? " " + blackMove.san : "");
+      let row = table.insertRow();
+      row.setAttribute('data-index', String(whiteMove.index));
+      row.insertCell(0).textContent = moveNumber;
+      row.insertCell(1).textContent = sanJoined;
+      row.insertCell(2).textContent = locus;
+      row.insertCell(3).textContent = combined;
+      row.insertCell(4).textContent = `${personCode}-${actionCode}-${objectCode}`;
+      row.insertCell(5).textContent = person;
+      row.insertCell(6).textContent = action;
+      row.insertCell(7).textContent = object;
+      row.insertCell(8).textContent = paoScene;
+    }
+  }
+}
+
+</script>
+</body>
+</html>
+
+</body>
+</html>
