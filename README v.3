@@ -1,0 +1,162 @@
+# 📑 Chess Mnemonic System — Master Spec (v3.0)
+
+## 🔹 Γενικά
+
+* **Μοναδική βιβλιοθήκη αναφοράς:** `libraries_v2.11.3_bilingual.json`
+* **Layout:** κάθετοι πίνακες (ένας κάτω από τον άλλο)
+* **Σειρά πινάκων:**
+
+  1. SAN Table
+  2. Associations Table
+  3. PAO Table 0–9
+  4. PAO Table 00–99
+
+---
+
+## 🔹 Header & Footer
+
+* **Title (browser + H1):** `PGN Import Standard vX`
+* **Footer:** `© Markellos Markides, 2025 — Version vX`
+
+---
+
+## 🔹 Γενικά Κουμπιά
+
+* **Import / Parse PGN**
+* **Clear** (καθαρίζει όλους τους πίνακες)
+* **Sticky πάντα ορατά**
+
+---
+
+## 🔹 Γλώσσες
+
+* **Switch (dropdown ή toggle):** Ελληνικά / English
+* Default: Ελληνικά
+* Όλα τα dropdowns & πίνακες εμφανίζονται μόνο στη γλώσσα που έχει επιλεγεί
+
+---
+
+## 🔹 Στήλες (κοινές σε όλους τους πίνακες)
+
+1. # (Αριθμός ημικίνησης / κίνησης)
+2. SAN
+3. Locus (LibraryT1)
+4. Anchor (LibraryT2)
+5. Χρώμα (λευκά/μαύρα)
+
+---
+
+## 🔹 SAN Table
+
+* **Επίπεδο:** ανα ημικίνηση (ply)
+* **Επιπλέον στήλες:** Κομμάτι, Target Square, FEN
+* **Dropdowns:** LibraryT1 (Locus)
+* **Download:** CSV + JSON
+
+---
+
+## 🔹 Associations Table
+
+* **Επίπεδο:** ανα ημικίνηση (ply)
+* **Επιπλέον στήλες:** Character (LibraryC1), Target Square (LibraryS1)
+* **Dropdowns:** LibraryT1 (Locus), LibraryT2 (Anchor), LibraryC1 (Characters), LibraryS1 (Spatial)
+* **Download:** CSV + JSON
+
+---
+
+## 🔹 PAO Table 0–9
+
+* **Επίπεδο:** ανα ημικίνηση (ply)
+* **Επιπλέον στήλες:** PAO Code (0–9), Person, Action, Object
+* **Dropdowns:** LibraryT1 (Locus), LibraryT2 (Anchor), LibraryP1 (PAO 0–9)
+* **Download:** CSV + JSON
+
+---
+
+## 🔹 PAO Table 00–99
+
+* **Επίπεδο:** ανα πλήρη κίνηση (move) → 1 σκηνή (Λευκά+Μαύρα)
+* **Επιπλέον στήλες:** Code1, Code2, Code3 (διψήφιοι), Person, Action, Object
+* **Dropdowns:** LibraryT1 (Locus), LibraryT2 (Anchor), LibraryP2 / LibraryP3 (PAO 00–99)
+* **Download:** CSV + JSON
+
+---
+
+## 🔹 Sticky Elements
+
+* Πάντα ορατά:
+
+  * Τίτλος (header)
+  * Γενικά κουμπιά (Import / Parse, Clear)
+  * Κουμπιά Download κάθε πίνακα
+* Sticky πρώτες στήλες (#, SAN, Locus, Anchor, Χρώμα)
+
+---
+
+## 🔹 Responsive Layout
+
+* **Laptop/Desktop:** Κανονικοί πίνακες με όλες τις στήλες.
+* **Mobile:**
+
+  * Κάθε γραμμή γίνεται **κάρτα**.
+  * Πάνω: # + SAN + Χρώμα
+  * Δίπλα/κάτω: **Εικόνα/σκηνή (PAO ή Character)**
+  * Expand → δείχνει λεπτομέρειες (codes, FEN, anchors, κτλ.)
+
+---
+
+## 🔹 Handling μεγάλων PGN
+
+* Παρτίδα εμφανίζεται σε **scrollable view** (όχι pagination)
+* **Textarea PGN input:** ίδιο μέγεθος όπως στην τελευταία έκδοση
+* **JSON library display (αν υπάρχει):** ίδιο ύψος όπως στην τελευταία έκδοση
+
+---
+
+## 🔹 Εμφάνιση Εικόνων
+
+* Όλα τα PAO & Characters εμφανίζονται ως **κειμενική περιγραφή**, όχι εικονίδια.
+
+---
+
+## 🔹 Methods & Functions
+
+### Parsing & SAN Handling
+
+* **`parsePGN()`** → διαβάζει PGN από το textarea, παράγει λίστα SAN.
+* **`fillSanTable()`** → γεμίζει τον SAN Table με τα δεδομένα (SAN, Piece, Square, FEN, Locus, Anchor).
+
+### PAO Handling
+
+* **`sanToTriplet(san)`** → μετατρέπει ένα SAN σε τριψήφιο PAO κωδικό.
+* **`splitIntoPairs(code)`** → σπάει έναν 6ψήφιο αριθμό σε τρία διψήφια για τον πίνακα PAO 00–99.
+* **`fillPaoTable_0_9()`** → γεμίζει τον πίνακα PAO 0–9 με βάση το LibraryP1.
+* **`fillPaoTable_00_99()`** → γεμίζει τον πίνακα PAO 00–99 με βάση LibraryP2/LibraryP3, μία σκηνή ανά πλήρη κίνηση.
+* **`lookupPAO(code, lib)`** → επιστρέφει Person/Action/Object για έναν κωδικό από την επιλεγμένη βιβλιοθήκη.
+
+### Associations
+
+* **`fillAssociationsTable()`** → γεμίζει τον πίνακα Associations με χαρακτήρες (LibraryC1) και τετράγωνα (LibraryS1).
+
+### Utilities
+
+* **`getSelectedPAOLibrary()`** → βρίσκει ποια συλλογή PAO (P2 ή P3) έχει επιλέξει ο χρήστης.
+* **`attachRowEvents(table)`** → προσθέτει hover/click events για highlighting.
+* **`clearTables()`** → καθαρίζει όλους τους πίνακες.
+* **`downloadTable(tableId, format)`** → κατεβάζει τα δεδομένα ενός πίνακα σε CSV ή JSON.
+
+---
+
+## 🔹 Για τον Επισκέπτη — Πώς δουλεύουν οι μέθοδοι στην απομνημόνευση
+
+* **SAN Table**: Μετατρέπει κάθε κίνηση (π.χ. `Nf3`) σε μικρές μονάδες πληροφορίας. Χρησιμοποιείται η τεχνική της **τμηματοποίησης (chunking)**, που εφαρμόζουν αθλητές μνήμης για να «σπάνε» μεγάλες ακολουθίες.
+
+* **Locus & Anchor**: Κάθε κίνηση τοποθετείται σε ένα «δωμάτιο» ή μια «θέση» μνήμης, όπως στο **Memory Palace (Method of Loci)**. Έτσι η παρτίδα «ταξιδεύει» σε μια νοητή διαδρομή.
+
+* **PAO 0–9**: Κάθε ημικίνηση μετατρέπεται σε μια μικρή εικόνα με Άτομο–Δράση–Αντικείμενο, όπως κάνουν οι αθλητές μνήμης στους **PAO systems**. Οι κινήσεις γίνονται ζωντανές σκηνές.
+
+* **PAO 00–99**: Δύο κινήσεις (λευκά–μαύρα) ενώνονται σε μία πλήρη σκηνή. Αυτή είναι κλασική τεχνική **συνένωσης εικόνων** για αποθήκευση μεγαλύτερων ακολουθιών.
+
+* **Associations**: Τα κομμάτια γίνονται χαρακτήρες (π.χ. βασιλιάς → ήρωας, ίππος → πολεμιστής). Οι χαρακτήρες κινούνται πάνω στη σκακιέρα. Πρόκειται για τεχνική **προσωποποίησης (personification)** που δίνει «πρόσωπο» σε αφηρημένες κινήσεις.
+
+👉 Έτσι, οι παρτίδες και οι θέσεις δεν απομνημονεύονται σαν σύμβολα, αλλά σαν **ιστορίες, εικόνες και σκηνές**, ακριβώς όπως κάνουν οι πρωταθλητές μνήμης σε διεθνείς αγώνες.
