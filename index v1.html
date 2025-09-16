@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PGN Import Standard v3.1</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <header>
+    <h1>PGN Import Standard v3.1</h1>
+    <div class="controls">
+      <button id="importPGN">Import PGN / SAN</button>
+      <button id="parsePGN">Parse PGN / SAN</button>
+      <button id="clearAll">Clear</button>
+      <button id="openlibraries">Open Libraries</button>
+	  <button id="openFenBuilder">Open FEN Builder</button>
+      <select id="languageSwitch">
+        <option value="el" selected>Ελληνικά</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- PGN Input -->
+  <section id="pgn-input">
+    <textarea id="pgnText" placeholder="Paste PGN / SAN εδώ και πάτησε «Parse PGN / SAN». Εναλλακτικά, χρησιμοποίησε «Import PGN / SAN» για να φορτώσεις αρχείο."></textarea>
+  </section>
+
+  <!-- SAN Table -->
+  <section id="san-table">
+    <h2>SAN Table</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th></th><th></th>
+            <th><select><option>LibraryT1</option></select></th>
+            <th><select><option>LibraryT2</option></select></th>
+            <th></th><th></th><th></th><th></th>
+          </tr>
+          <tr>
+            <th>Move #</th>
+            <th>SAN</th>
+            <th>Locus</th>
+            <th>Anchor</th>
+            <th>Χρώμα</th>
+            <th>Piece</th>
+            <th>Target Square</th>
+            <th>FEN</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+	 <button id="download-san-csv">Download CSV</button>
+     <button id="download-san-json">Download JSON</button>
+    </div>
+  </section>
+
+  <!-- Associations Table -->
+  <section id="associations-table">
+    <h2>Associations Table</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th></th><th></th>
+            <th><select><option>LibraryT1</option></select></th>
+            <th><select><option>LibraryT2</option></select></th>
+            <th></th>
+            <th><select><option>LibraryC1</option></select></th>
+            <th><select><option>LibraryS1</option></select></th>
+          </tr>
+          <tr>
+            <th>Move #</th>
+            <th>SAN</th>
+            <th>Locus</th>
+            <th>Anchor</th>
+            <th>Χρώμα</th>
+            <th>Piece Association</th>
+            <th>Target Square Association</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+     <button id="download-associations-csv">Download CSV</button>
+     <button id="download-associations-json">Download JSON</button>
+    </div>
+  </section>
+
+  <!-- PAO Table 0–9 -->
+  <section id="pao-0-9-table">
+    <h2>PAO Table 0–9</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th></th><th></th>
+            <th><select><option>LibraryT1</option></select></th>
+            <th><select><option>LibraryT2</option></select></th>
+            <th></th><th></th>
+            <th><select><option>LibraryP1</option></select></th>
+		   </tr>
+          <tr>
+            <th>Move #</th>
+            <th>SAN</th>
+            <th>Locus</th>
+            <th>Anchor</th>
+            <th>Χρώμα</th>
+            <th>PAO Code</th>
+            <th>Person / Action / Object</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+	 <button id="download-pao9-csv">Download CSV</button>
+     <button id="download-pao9-json">Download JSON</button>
+    </div>
+  </section>
+
+  <!-- PAO Table 00–99 -->
+  <section id="pao-00-99-table">
+    <h2>PAO Table 00–99</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th></th><th></th>
+            <th><select><option>LibraryT1</option></select></th>
+            <th><select><option>LibraryT2</option></select></th>
+            <th></th><th></th>
+            <th><select><option>LibraryP2</option></select></th>
+           </tr>
+          <tr>
+            <th>Move #</th>
+            <th>SAN</th>
+            <th>Locus</th>
+            <th>Anchor</th>
+            <th>Χρώμα</th>
+            <th>PAO Code</th>
+            <th>Person / Action / Object</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+	 <button id="download-pao99-csv">Download CSV</button>
+     <button id="download-pao99-json">Download JSON</button>
+    </div>
+  </section>
+
+  <!-- Verse Table -->
+  <section id="verse-table">
+    <h2>Verse Table</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th></th><th></th>
+            <th><select><option>LibraryT1</option></select></th>
+            <th><select><option>LibraryT2</option></select></th>
+            <th></th>
+            <th></th><th></th><th></th><th></th>
+          </tr>
+          <tr>
+            <th>Move #</th>
+            <th>SAN</th>
+            <th>Locus</th>
+            <th>Anchor</th>
+            <th>Χρώμα</th>
+            <th>Piece Verse</th>
+            <th>File Verse</th>
+            <th>Rank Verse</th>
+            <th>Closing</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+	 <button id="download-verse-csv">Download CSV</button>
+     <button id="download-verse-json">Download JSON</button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© Markellos Markides, 2025 — Version v3.1</p>
+  </footer>
+</body>
+</html>
