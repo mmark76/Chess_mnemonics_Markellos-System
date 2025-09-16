@@ -440,7 +440,7 @@
   },
    
   "Foundations": {
-  "LibraryF1": {
+   "LibraryF1": {
     "P": { "el": "Πιόνι", "en": "Pawn", "code": "1" },
     "N": { "el": "Ιππότης", "en": "Knight", "code": "2" },
     "B": { "el": "Αξιωματικός", "en": "Bishop", "code": "3" },
@@ -452,7 +452,7 @@
     "#": { "el": "Ματ", "en": "Checkmate", "code": "9" },
     "0-0": { "el": "Ροκέ Μικρό", "en": "Kingside Castling", "code": "0" }
   },
- "LibraryF2": {
+   "LibraryF2": {
   "1": { "el": "Φωτιά", "en": "Fire" },
   "2": { "el": "Νερό", "en": "Water" },
   "3": { "el": "Γη", "en": "Earth" },
@@ -557,6 +557,7 @@
   },
 
   "Verses": {
+   "LibraryV1": {
     "Pieces": {
       "P": { "el": "πονι", "en": "poni" },
       "N": { "el": "νάιτ", "en": "knight" },
@@ -595,5 +596,6 @@
         { "el": "λι", "en": "li" }
       ]
     }
+  }
   }
 }
