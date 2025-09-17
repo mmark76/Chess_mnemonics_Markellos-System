@@ -1,0 +1,154 @@
+/* === FEN Builder Styling === */
+
+body {
+  font-family: Arial, sans-serif;
+  background: #fafafa;
+  color: #222;
+  margin: 0;
+  padding: 20px;
+}
+
+.fen-builder-container {
+  width: 370px;
+  margin: auto;
+  margin-top: 30px;
+  margin-bottom: 40px;
+  background: #fff;
+  border: 1px solid #e2e5eb;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 9px 0 #e2e5eb;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.side-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.side-btn {
+  background: #f6f8fa;
+  border: 1px solid #bcd3ea;
+  color: #222;
+  font-size: 14px;
+  padding: 6px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.16s, border 0.16s;
+}
+.side-btn.selected,
+.side-btn:hover {
+  background: #3697ef;
+  color: #fff;
+  border: 1.5px solid #3697ef;
+}
+
+/* Castling switches */
+.castle-options {
+  margin-bottom: 15px;
+}
+.castle-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #e2e5eb;
+  border-radius: 20px;
+  transition: .3s;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 15px;
+  width: 15px;
+  left: 3px;
+  bottom: 2.3px;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px 0 #aaa;
+  transition: .3s;
+}
+input:checked + .slider { background-color: #3697ef; }
+input:checked + .slider:before { transform: translateX(14px); }
+
+/* Inputs & buttons */
+.minimal-btn {
+  background: #f8f8f8;
+  border: 1px solid #ccc;
+  color: #222;
+  font-size: 14px;
+  padding: 6px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+  margin: 4px;
+  transition: background 0.17s, border 0.17s;
+}
+.minimal-btn:hover {
+  background: #ececec;
+  border: 1px solid #999;
+}
+
+.fen-input-bar {
+  text-align: center;
+  margin: 15px 0;
+}
+.fen-input-bar input {
+  width: 97%;
+  max-width: 340px;
+  font-size: 15px;
+  height: 38px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  margin-bottom: 10px;
+}
+
+.board {
+  width: 350px;
+  margin: 15px auto;
+}
+
+.board-buttons {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.fen-output-bar {
+  text-align: center;
+  margin-top: 20px;
+}
+.fen-output-bar input {
+  width: 92%;
+  max-width: 340px;
+  font-size: 15px;
+  height: 38px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  margin-top: 8px;
+}

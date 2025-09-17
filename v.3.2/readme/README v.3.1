@@ -1,0 +1,154 @@
+# 📑 Chess Mnemonic System — Master Spec (v3.1)
+
+## 🔹 Γενικά
+
+* Μοναδική βιβλιοθήκη αναφοράς: libraries_v3.json
+* Layout: κάθετοι πίνακες (ένας κάτω από τον άλλο)
+* Σειρά πινάκων:
+  1. SAN Table
+  2. Associations Table
+  3. PAO Table 0–9
+  4. PAO Table 00–99
+  5. Verses Table
+
+---
+
+## 🔹 Header & Footer
+
+* Title (browser + H1): PGN Import Standard vX
+* Footer: © Markellos Markides, 2025 — Version vX
+
+---
+
+## 🔹 Γενικά Κουμπιά
+
+* Import / Parse PGN
+* Clear (καθαρίζει όλους τους πίνακες)
+* Sticky πάντα ορατά
+
+---
+
+## 🔹 Γλώσσες
+
+* Switch (dropdown ή toggle): Ελληνικά / English
+* Default: Ελληνικά
+* Όλα τα dropdowns & πίνακες εμφανίζονται μόνο στη γλώσσα που έχει επιλεγεί
+
+---
+
+## 🔹 Στήλες (κοινές σε όλους τους πίνακες)
+
+1. # (Αριθμός ημικίνησης / κίνησης)
+2. SAN
+3. Locus (LibraryT1)
+4. Anchor (LibraryT2)
+5. Χρώμα (λευκά/μαύρα)
+
+---
+
+## 🔹 SAN Table
+
+* Επίπεδο: ανά ημικίνηση (ply)
+* Επιπλέον στήλες: Κομμάτι, Target Square, FEN
+* Dropdowns: LibraryT1 (Locus)
+* Download: CSV + JSON
+
+---
+
+## 🔹 Associations Table
+
+* Επίπεδο: ανά ημικίνηση (ply)
+* Επιπλέον στήλες:
+  - Piece Association (LibraryC1)
+  - Square Association (LibraryS1)
+* Dropdowns: LibraryT1 (Locus), LibraryT2 (Anchor), LibraryC1 (Pieces), LibraryS1 (Squares)
+* Download: CSV + JSON
+
+---
+
+## 🔹 PAO Table 0–9
+
+* Επίπεδο: ανά ημικίνηση (ply)
+* Επιπλέον στήλες: PAO Code (0–9), Person, Action, Object
+* Dropdowns: LibraryT1 (Locus), LibraryT2 (Anchor), LibraryP1 (PAO 0–9)
+* Download: CSV + JSON
+
+---
+
+## 🔹 PAO Table 00–99
+
+* Επίπεδο: ανά πλήρη κίνηση (move) → 1 σκηνή (Λευκά+Μαύρα)
+* Επιπλέον στήλες: Code1, Code2, Code3 (διψήφιοι), Person, Action, Object
+* Dropdowns: LibraryT1 (Locus), LibraryT2 (Anchor), LibraryP2 / LibraryP3 (PAO 00–99)
+* Download: CSV + JSON
+
+---
+
+## 🔹 Verses Table
+
+* Επίπεδο: ανά ημικίνηση (ply)
+* Στήλες: Piece Verse, File Verse, Rank Verse, Closing Verse
+* Dropdowns: LibraryT1 (Locus), LibraryT2 (Anchor), Verses (Pieces, Files, Ranks, Closings)
+* Download: CSV + JSON
+
+---
+
+## 🔹 Sticky Elements
+
+* Πάντα ορατά:
+  - Τίτλος (header)
+  - Γενικά κουμπιά (Import / Parse, Clear)
+  - Κουμπιά Download κάθε πίνακα
+* Sticky πρώτες στήλες (#, SAN, Locus, Anchor, Χρώμα)
+
+---
+
+## 🔹 Responsive Layout
+
+* Laptop/Desktop: Κανονικοί πίνακες με όλες τις στήλες.
+* Mobile:
+  - Κάθε γραμμή γίνεται κάρτα.
+  - Πάνω: # + SAN + Χρώμα
+  - Δίπλα/κάτω: Εικόνα/σκηνή (PAO ή Character)
+  - Expand → δείχνει λεπτομέρειες (codes, FEN, anchors, κτλ.)
+
+---
+
+## 🔹 Handling μεγάλων PGN
+
+* Παρτίδα εμφανίζεται σε scrollable view (όχι pagination)
+* Textarea PGN input: ίδιο μέγεθος όπως στην τελευταία έκδοση
+* JSON library display (αν υπάρχει): ίδιο ύψος όπως στην τελευταία έκδοση
+
+---
+
+## 🔹 Εμφάνιση Εικόνων
+
+* Όλα τα PAO & Characters εμφανίζονται ως κειμενική περιγραφή, όχι εικονίδια.
+
+---
+
+## 🔹 Methods & Functions
+
+### Parsing & SAN Handling
+* parsePGN() → διαβάζει PGN από το textarea, παράγει λίστα SAN.
+* fillSanTable() → γεμίζει τον SAN Table με τα δεδομένα (SAN, Piece, Square, FEN, Locus, Anchor).
+
+### PAO Handling
+* sanToTriplet(san) → μετατρέπει ένα SAN σε τριψήφιο PAO κωδικό.
+* splitIntoPairs(code) → σπάει έναν 6ψήφιο αριθμό σε τρία διψήφια για τον πίνακα PAO 00–99.
+* fillPaoTable_0_9() → γεμίζει τον πίνακα PAO 0–9 με βάση το LibraryP1.
+* fillPaoTable_00_99() → γεμίζει τον πίνακα PAO 00–99 με βάση LibraryP2/LibraryP3.
+* lookupPAO(code, lib) → επιστρέφει Person/Action/Object για έναν κωδικό.
+
+### Associations
+* fillAssociationsTable() → γεμίζει τον πίνακα Associations με Piece/Square Associations.
+
+### Verses
+* fillVersesTable() → γεμίζει τον πίνακα Verses με Piece/File/Rank/Closing.
+
+### Utilities
+* getSelectedPAOLibrary() → βρίσκει ποια συλλογή PAO (P2 ή P3) έχει επιλεγεί.
+* attachRowEvents(table) → προσθέτει hover/click events για highlighting.
+* clearTables() → καθαρίζει όλους τους πίνακες.
+* downloadTable(tableId, format) → κατεβάζει τα δεδομένα ενός πίνακα σε CSV ή JSON.

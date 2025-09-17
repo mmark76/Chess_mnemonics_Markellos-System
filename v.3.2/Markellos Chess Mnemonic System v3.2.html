@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <!-- ✅ Basic Meta -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <!-- ✅ SEO Meta -->
+  <meta name="description" content="PGN Import Standard v3.2 — Chess mnemonic system with SAN, Associations, PAO, and Verse tables.">
+  <meta name="author" content="Markellos Markides">
+  <meta name="keywords" content="chess, PGN, SAN, mnemonic, PAO, memory palace, chess training, chess notation">
+  
+  <!-- ✅ Social / Open Graph -->
+  <meta property="og:title" content="PGN Import Standard v3.2">
+  <meta property="og:description" content="Chess mnemonic system — Parse PGN and view SAN, Associations, PAO 0–9, PAO 00–99, and Verse tables.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://your-domain.com">
+  <meta property="og:image" content="https://your-domain.com/preview.png">
+  
+  <!-- ✅ Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PGN Import Standard v3.2">
+  <meta name="twitter:description" content="Chess mnemonic system with SAN, Associations, PAO, Verse.">
+  <meta name="twitter:image" content="https://your-domain.com/preview.png">
+  
+  <!-- ✅ Mobile -->
+  <meta name="theme-color" content="#222222">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <!-- ✅ Title -->
+  <title>PGN Import Standard v3.2</title>
+  
+  <!-- ✅ Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- ✅ External Libraries -->
+  <script src="vendor/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="vendor/chessboard.js"></script>
+  <script src="vendor/papaparse.min.js"></script>
+  <script src="vendor/FileSaver.min.js"></script>
+  
+  <!-- ✅ Project Scripts -->
+  <script src="js/main.js" defer></script>
+  <script src="js/pgn.js" defer></script>
+  <script src="js/ui.js" defer></script>
+  <script src="js/export.js" defer></script>
+</head>
+
+<body>
+  <!-- Header -->
+  <header>
+    <h1>Markellos Chess Mnemonic System v3.2</h1>
+    <div class="controls">
+      <button id="importPGN">Import PGN / SAN</button>
+      <button id="parsePGN">Parse PGN / SAN</button>
+      <button id="clearAll">Clear</button>
+	  <button id="openFenBuilder">Open/Show FEN Builder</button>
+      <select id="languageSwitch">
+        <option value="el" selected>Ελληνικά</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+	
+ <!-- Google Translate placeholder -->
+  <div id="google_translate_element"></div>
+  </header>
+
+  <!-- PGN Input -->
+  <section id="pgn-input">
+    <textarea id="pgnText" placeholder="Paste PGN / SAN εδώ και πάτησε «Parse PGN / SAN». Εναλλακτικά, χρησιμοποίησε «Import PGN / SAN» για να φορτώσεις αρχείο."></textarea>
+  </section>
+
+  <!-- Table Selector -->
+  <section id="table-selector">
+    <h2>Επιλογή Πίνακα</h2>
+    <div class="controls">
+      <button onclick="showTable('san-table')">SAN Table</button>
+      <button onclick="showTable('associations-table')">Associations Table</button>
+      <button onclick="showTable('pao-0-9-table')">PAO 0–9 Table</button>
+      <button onclick="showTable('pao-00-99-table')">PAO 00–99 Table</button>
+      <button onclick="showTable('verse-table')">Verse Table</button>
+      <button onclick="showTable('all-tables')">All-Tables</button>
+    </div>
+  </section>
+  
+  <!-- Libraries Selector -->
+  <section id="Library-selector">
+    <h2>Επιλογή Βιβλιοθήκης</h2>
+    <div class="control-libr">
+      <button onclick="showLibrary('Temporal-Libraries')">Temporal-Libraries</button>
+      <button onclick="showLibrary('Spatial-Libraries')">Spatial-Libraries</button>
+      <button onclick="showLibrary('Characters-Libraries')">Characters-Libraries</button>
+      <button onclick="showLibrary('PAO-Libraries')">PAO-Libraries</button>
+      <button onclick="showLibrary('Verses-Libraries')">Verses-Libraries</button>
+      <button onclick="showLibrary('Foundations-Libraries')">Foundations-Libraries</button>
+	  <button onclick="showLibrary('All-Libraries')">All-Libraries</button>
+    </div>
+  </section>
+  
+  <!-- SAN Table -->
+  <section id="san-table">
+    <h2>SAN Table</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th></th><th></th>
+            <th><select><option>LibraryT1</option></select></th>
+            <th><select><option>LibraryT2</option></select></th>
+            <th></th><th></th><th></th><th></th>
+          </tr>
+          <tr>
+            <th>Move #</th>
+            <th>SAN</th>
+            <th>Locus</th>
+            <th>Anchor</th>
+            <th>Χρώμα</th>
+            <th>Piece</th>
+            <th>Target Square</th>
+            <th>FEN</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+	 <button id="download-san-csv">Download CSV</button>
+     <button id="download-san-json">Download JSON</button>
+    </div>
+  </section>
+
+  <!-- Associations Table -->
+  <section id="associations-table">
+    <h2>Associations Table</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th></th><th></th>
+            <th><select><option>LibraryT1</option></select></th>
+            <th><select><option>LibraryT2</option></select></th>
+            <th></th>
+            <th><select><option>LibraryC1</option></select></th>
+            <th><select><option>LibraryS1</option></select></th>
+          </tr>
+          <tr>
+            <th>Move #</th>
+            <th>SAN</th>
+            <th>Locus</th>
+            <th>Anchor</th>
+            <th>Χρώμα</th>
+            <th>Piece Association</th>
+            <th>Target Square Association</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+     <button id="download-associations-csv">Download CSV</button>
+     <button id="download-associations-json">Download JSON</button>
+    </div>
+  </section>
+
+  <!-- PAO Table 0–9 -->
+  <section id="pao-0-9-table">
+    <h2>PAO Table 0–9</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th></th><th></th>
+            <th><select><option>LibraryT1</option></select></th>
+            <th><select><option>LibraryT2</option></select></th>
+            <th></th><th></th>
+            <th><select><option>LibraryP1</option></select></th>
+		   </tr>
+          <tr>
+            <th>Move #</th>
+            <th>SAN</th>
+            <th>Locus</th>
+            <th>Anchor</th>
+            <th>Χρώμα</th>
+            <th>PAO Code</th>
+            <th>Person / Action / Object</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+	 <button id="download-pao9-csv">Download CSV</button>
+     <button id="download-pao9-json">Download JSON</button>
+    </div>
+  </section>
+
+  <!-- PAO Table 00–99 -->
+  <section id="pao-00-99-table">
+    <h2>PAO Table 00–99</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th></th><th></th>
+            <th><select><option>LibraryT1</option></select></th>
+            <th><select><option>LibraryT2</option></select></th>
+            <th></th><th></th>
+            <th><select><option>LibraryP2</option><option>LibraryP3</option></select></th>
+		   </tr>
+          <tr>
+            <th>Move #</th>
+            <th>SAN</th>
+            <th>Locus</th>
+            <th>Anchor</th>
+            <th>Χρώμα</th>
+            <th>PAO Code</th>
+            <th>Person / Action / Object</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+	 <button id="download-pao99-csv">Download CSV</button>
+     <button id="download-pao99-json">Download JSON</button>
+    </div>
+  </section>
+
+  <!-- Verse Table -->
+  <section id="verse-table">
+    <h2>Verse Table</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th></th><th></th>
+            <th><select><option>LibraryT1</option></select></th>
+            <th><select><option>LibraryT2</option></select></th>
+            <th></th><th></th>
+            <th><select><option>LibraryV1</option></select></th>
+            <th></th><th></th>
+		  </tr>
+          <tr>
+            <th>Move #</th>
+            <th>SAN</th>
+            <th>Locus</th>
+            <th>Anchor</th>
+            <th>Χρώμα</th>
+            <th>Piece Verse</th>
+            <th>File Verse</th>
+            <th>Rank Verse</th>
+            <th>Closing</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+	 <button id="download-verse-csv">Download CSV</button>
+     <button id="download-verse-json">Download JSON</button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© Markellos Markides, 2025 — Markellos Chess Mnemonic System v3.2</p>
+  </footer>
+</body>
+</html>
